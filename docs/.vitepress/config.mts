@@ -50,7 +50,8 @@ export default defineConfig({
       '/comfyui/': [
         { text: 'ComfyUI 新手专区', items: [
           { text: '认识 ComfyUI', link: '/comfyui/' },
-          { text: 'Mac · Apple Silicon', link: '/comfyui/mac' },
+          { text: 'Mac · 桌面版零命令安装', link: '/comfyui/mac' },
+          { text: '新手术语词典', link: '/comfyui/glossary' },
           { text: 'Ubuntu · NVIDIA', link: '/comfyui/ubuntu' },
           { text: 'Windows · NVIDIA', link: '/comfyui/windows' }
         ] },
@@ -60,6 +61,7 @@ export default defineConfig({
           { text: '常见问题与排查', link: '/comfyui/troubleshooting' }
         ] },
         { text: '进阶与自动化', items: [
+          { text: 'Mac · 手动安装（进阶）', link: '/comfyui/mac-manual' },
           { text: 'ComfyUI 本地 API', link: '/comfyui/api' }
         ] }
       ],

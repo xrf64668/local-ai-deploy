@@ -1,124 +1,105 @@
-# Mac 安装 ComfyUI：从零到第一次生成
+# Mac 新手安装 ComfyUI：先不用终端
 
-适用于 **Apple Silicon（M1 / M2 / M3 / M4 / M5 系列）**。本教程分别提供新手优先的 **Desktop 图形安装**、适合开发者的 **手动隔离安装**。
+第一次接触 ComfyUI？**这篇从鼠标点击开始**。不需要先理解 Python、Git 或虚拟环境，也不用复制几十行指令。
 
-> 本页属于步骤指南，并非实测性能榜单。Mac 的 ComfyUI 主要使用 PyTorch **MPS**；这和其他项目使用的 **MLX** 不是同一套推理运行时。
+**适合谁：** 使用 Apple Silicon（M 系列芯片）的 Mac，希望在自己电脑上体验 AI 生成图片的读者。
 
-## 01 · 安装前检查
+**学完能做到：** 安装 ComfyUI → 打开节点画布 → 配置一个真实模型 → 生成第一张图片。
 
-打开「终端」，依次复制：
+::: tip 先选路线，别两条一起操作
+**第一次使用：** 继续阅读本页的「Desktop 图形安装」。**已经了解终端、想控制 Python 和目录：** 直接进入 [Mac 手动安装（进阶）](/comfyui/mac-manual)。
+
+Desktop 和手动版会使用不同的环境与数据目录，不要混用指令。
+:::
+
+## 01 · 确认你的 Mac 适合哪条路线
+
+先不用打开终端。
+
+1. 点击屏幕左上角的 **苹果图标  → 关于本机**。
+2. 找到「芯片」：如果显示 Apple M1、M2、M3、M4、M5 等，就属于本教程的 Apple Silicon 范围。
+3. 记下「内存」和「macOS 版本」。打开 **系统设置 → 通用 → 储存空间**，确认有足够空间。
+4. [前往 ComfyUI 官方下载页](https://www.comfy.org/download)，查看当前安装包对 macOS 的具体要求。要求可能随版本改变，务必以下载页为准。
+
+**怎样算通过？** 已经知道你的芯片、内存、macOS 版本与剩余磁盘空间。暂时不用搞懂 MPS 或 CUDA。
+
+::: details 可选：想用终端再核对一下芯片？
+打开 Mac 自带的「终端」，只复制这一行：
 
 ```bash
 uname -m
-sw_vers -productVersion
-sysctl -n hw.memsize | awk '{printf "统一内存约 %.0f GiB\n", $1/1073741824}'
-df -h .
 ```
 
-**通过标准：** 第一条输出 `arm64`，确认是 Apple Silicon；磁盘留足程序、Python 依赖和模型权重空间。若是 `x86_64`，不要直接套用这里的 Apple Silicon 步骤。
+- 显示 `arm64`：当前终端运行在 ARM 架构环境，通常符合 Apple Silicon 路线。
+- 显示 `x86_64`：可能是 Intel Mac 或终端在 Rosetta 下运行，请用「关于本机」再次确认。
 
-| 需要什么 | 如何确认 | 不满足怎么办 |
-| --- | --- | --- |
-| Apple Silicon | `uname -m` 为 `arm64` | Intel Mac 请查询 [ComfyUI 官方文档](https://docs.comfy.org/installation/manual_install) |
-| 合适的 macOS | `sw_vers -productVersion` | 根据所下载 Desktop 版本的最低要求决定是否升级 |
-| 可用空间 | `df -h .` | 模型通常比程序大；清理或选择合适的项目磁盘 |
-| 对应工作流的内存 | 查看统一内存和模型要求 | 先从低分辨率图像模型开始，不直接挑战重型视频模型 |
-
-## 02 · 路线 A：Desktop 图形安装（新手推荐）
-
-1. 打开 [ComfyUI 官方下载页](https://www.comfy.org/download)，点击 **Install from GitHub**，选择适合当前 macOS 的 Desktop 安装包。
-2. 按发布页面指引安装并首次启动。遇到 macOS 安全确认时，只确认自己从官方来源下载的安装包。
-3. 首次启动时选择**专门的模型与数据存储目录**；不要误选已有的 `CUSTOM_DEPLOY` 模型目录进行覆盖。
-4. 根据应用提示完成依赖准备；完成后进入 ComfyUI 节点画布。
-
-**通过标准：** Desktop 能启动、画布能打开、设置/日志中没有致命安装错误。
-
-Desktop 的目录、启动方式与更新机制和本页后面的手动方案不同，**不要把两种方式的命令混着执行**。
-
-## 03 · 路线 B：手动隔离安装（适合希望控制环境的人）
-
-需要：Git、可用的 **Python 3.11 或 3.12** 以及 Apple Command Line Tools。先检查：
-
-```bash
-git --version
-python3 --version
-xcode-select -p
-```
-
-如果未安装命令行工具，可以执行 `xcode-select --install` 并按系统提示完成。若 `python3` 版本不符合所选 PyTorch 兼容范围，请先安装兼容版本，不要硬套系统自带 Python。
-
-在你打算存放项目的目录下执行下面的整段命令；**所有项目代码、venv、模型和缓存都留在新建的 `comfyui-local` 文件夹中**：
-
-```bash
-mkdir -p comfyui-local
-cd comfyui-local
-PROJECT_ROOT="$(pwd -P)"
-
-git clone https://github.com/Comfy-Org/ComfyUI.git src
-python3 -m venv .venv
-source .venv/bin/activate
-
-export HF_HOME="$PROJECT_ROOT/.cache/huggingface"
-export XDG_CACHE_HOME="$PROJECT_ROOT/.cache/xdg"
-export TORCH_HOME="$PROJECT_ROOT/.cache/torch"
-
-python -m pip install --upgrade pip
-python -m pip install torch torchvision torchaudio
-python -m pip install -r src/requirements.txt
-
-python -c "import torch; print('PyTorch:', torch.__version__); print('MPS:', torch.backends.mps.is_available())"
-```
-
-**通过标准：** 最后一条命令输出 `MPS: True`。若为 `False`，应先检查 macOS / PyTorch 安装与设备支持，不要将 CPU 运行误判为 Metal 加速成功。
-
-在同一个终端继续启动：
-
-```bash
-cd "$PROJECT_ROOT/src"
-python main.py --listen 127.0.0.1 --port 8188
-```
-
-另开一个终端验证：
-
-```bash
-curl -f http://127.0.0.1:8188/system_stats
-```
-
-**通过标准：** 浏览器能打开 `http://127.0.0.1:8188`，且上述命令返回 JSON。停止服务时在运行窗口按 `Ctrl+C`。
-
-::: tip 下次如何启动？
-进入你的 `comfyui-local` 目录，执行 `source .venv/bin/activate`，重新设置 `PROJECT_ROOT` 及 `HF_HOME`、`XDG_CACHE_HOME`、`TORCH_HOME`，再 `cd src && python main.py --listen 127.0.0.1 --port 8188`。缓存路径的设置要和第一次一致。
+**命令解释：** `uname` 用来查看系统信息；`-m` 表示查看处理器架构。它只读取信息，不会安装或修改任何软件。
 :::
 
-## 04 · 下载模型并生成第一张图片
+## 02 · 下载 Desktop：跟着界面操作
 
-1. 从 ComfyUI 内置的工作流模板中选一个**基础文生图**工作流，记录模板所需的模型名称。
-2. 通过模板说明或模型发布者的页面下载匹配的完整权重及必要组件。检查模型许可证与文件大小。
-3. 手动安装时，将权重放到 `src/models/checkpoints/`、`src/models/vae/`、`src/models/text_encoders/` 或其他工作流指定目录；Desktop 按应用显示的模型目录操作。
-4. 在工作流中选择实际存在的模型，先使用低分辨率、单张图片、较小批量。
-5. 点击 Queue / Run（界面版本不同，按钮名称可能略有差异），等待执行完成。
+<small>**本阶段目标：** 让 ComfyUI 软件正常打开，不要求它立即生成图片。</small>
 
-**通过标准：** 工作流执行无红色错误节点，输出目录里出现可以打开的图片。仅打开画布不算首次推理成功。
+**第 1 步：下载。** 打开 [ComfyUI 官方下载页](https://www.comfy.org/download)，点击 **Install from GitHub**（从 GitHub 安装）。进入官方发布页面后，选择与当前 Mac 系统匹配的安装包。
 
-## 05 · API 与故障排查
+**第 2 步：安装。** 按下载包或 macOS 的提示完成安装。在首次打开出现安全提示时，核对下载来源；不要为未知来源的程序随意关闭系统安全设置。
 
-手动安装的默认教学地址是 `127.0.0.1:8188`：
+**第 3 步：选择数据保存位置。** 安装向导如果提示选择存储目录，推荐新建一个专门用于 ComfyUI 的目录，且磁盘空间足够。**先记录目录位置，后面放模型时会用到。**
 
-```bash
-curl -f http://127.0.0.1:8188/system_stats
-curl -f http://127.0.0.1:8188/queue
-```
+**第 4 步：等待初始化完成。** 第一次打开可能需要安装依赖或准备资源。依照界面操作，遇到明确报错时停止并记录原文，不要继续反复点击。
 
-要提交工作流，请阅读 [ComfyUI API 完整示例](/comfyui/api)。Desktop 应以实际开放的本地 API 地址为准，不能假定一定是 8188。
+::: tip 成功标志
+你能看到 ComfyUI 的**节点画布**，能够打开工作流菜单，而且没有持续弹出的安装失败提示。
 
-| 症状 | 优先排查 |
+注意：**画布打开只说明软件启动成功，尚不代表安装了 AI 模型。**
+:::
+
+## 03 · 认识界面，只需要懂三个词
+
+| 你会看到的词 | 用最简单的话解释 | 当前要做什么 |
+| --- | --- | --- |
+| **工作流（Workflow）** | 把“输入文字 → 生成图片 → 保存图片”连起来的流程 | 先使用现成模板 |
+| **节点（Node）** | 工作流里的一个功能方块，例如加载模型、填写文字 | 不必急着自己连线 |
+| **模型（Model）** | 真正负责生成内容的权重文件，通常比软件本身大 | 跟着模板下载匹配版本 |
+
+不认识 `Checkpoint`、`VAE`、`LoRA`？先跳过，后面用到时再看 [术语词典](/comfyui/glossary)。
+
+## 04 · 生成第一张图片
+
+1. 找到 ComfyUI 的**工作流模板**入口，选择一个明确标记为 **本地文生图（Text to Image）** 的基础模板。
+2. 如果提示下载模型，先看清楚模型名称、大小、许可证以及 Mac 的运行条件。按模板说明下载所需组件；**不要误选需要付费云端账号的 API 模板**。
+3. 在文字输入节点里填写你想画的内容。例如：`A cozy wooden cabin under the stars, warm light, illustration`（星空下亮着暖灯的木屋，插画风格）。
+4. 首次生成尽量选择低负载配置：**一次只生成 1 张**；如果模板允许调整尺寸，可以从 512×512 左右开始。
+5. 点击界面中的 **Run / Queue**（运行/加入队列），等待任务完成。
+
+::: tip 真正的成功标志
+画布没有红色错误节点，而且你能在预览中看到图片、在应用指定的输出目录找到并打开实际图片文件。**只有这一步完成，才算第一次生成成功。**
+:::
+
+更详细的节点和模型查找方法：[第一次生成图片完整图解式说明](/comfyui/first-workflow)。
+
+## 05 · 遇到问题时先看这里
+
+| 你遇到的情况 | 先怎么处理 |
 | --- | --- |
-| `MPS: False` | 是否为 arm64、PyTorch 是否正确安装、macOS / GPU 是否支持 |
-| `ModuleNotFoundError` | 是否激活了本项目 `.venv`、依赖是否装进该环境 |
-| `model not found` | 权重文件是否放在当前 ComfyUI 使用的模型目录，工作流引用是否匹配 |
-| 内存不足或卡死 | 降低分辨率、帧数和批量，关闭其他占用内存的应用 |
-| 8188 端口占用 | 关闭其他实例，或在启动时使用 `--port 8189` 并同步修改验证地址 |
+| 下载页面不知道选哪个文件 | 确认「关于本机」的芯片与 macOS 版本，再看对应发布说明 |
+| 软件能打开，但不能生成 | 多数情况下还缺少**模型文件**或工作流组件，先读模板提示 |
+| 提示找不到模型 | 去 [模型目录说明](/comfyui/models-and-paths) 核对 Desktop 实际的存储位置 |
+| 出现内存不足 | 先降低图片尺寸和生成数量，关闭占用大量内存的软件 |
+| 没有 Run / Queue 按钮 | 不同界面版本位置可能不同，检查主菜单、执行队列或官方界面说明 |
+| 报错里出现 MPS / Python | 先不要重装系统，记录完整错误并看 [常见问题](/comfyui/troubleshooting) |
 
-**提醒：** 不要直接把未加鉴权的 ComfyUI 接口暴露到公网。
+## 06 · 已经能生成图片了，接下来怎么学？
 
-参考：[官方手动安装](https://docs.comfy.org/installation/manual_install) · [ComfyUI GitHub](https://github.com/Comfy-Org/ComfyUI)
+你可以继续探索：
+
+- [第一次生成：看懂节点、输出文件与参数](/comfyui/first-workflow)
+- [模型目录：Checkpoint、VAE、LoRA 放哪里](/comfyui/models-and-paths)
+- [需要完全控制环境？Mac 手动安装进阶篇](/comfyui/mac-manual)
+- [想让 Java / Web 调用？ComfyUI API](/comfyui/api)
+
+::: warning 跟 MLX 项目有什么关系？
+Mac 上的 ComfyUI 常用 **PyTorch MPS** 进行本地 GPU 推理；你单独部署的 LTX/Wan **MLX** 环境不代表能直接在 ComfyUI 加载相同格式的权重。两者优先保持独立。
+:::
+
+资料：[ComfyUI 官方下载页](https://www.comfy.org/download) · [官方手动安装文档](https://docs.comfy.org/installation/manual_install)

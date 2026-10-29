@@ -42,3 +42,10 @@
   .VPFeature { transition: none; }
   .VPFeature:hover { transform: none; }
 }
+
+/* Beginner-focused documentation: readable callouts and collapsible explanations */
+.vp-doc .custom-block.tip { border-left: 3px solid var(--vp-c-brand-1); }
+.vp-doc .custom-block.details { border: 1px solid var(--vp-c-divider); background: var(--vp-c-bg-soft); }
+.vp-doc .custom-block.details summary { font-weight: 600; cursor: pointer; }
+.vp-doc table td { min-width: 6rem; }
+.vp-doc div[class*='language-'] + p { margin-top: .9rem; }

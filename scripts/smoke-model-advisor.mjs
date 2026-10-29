@@ -162,6 +162,15 @@ try {
   assert.ok(await retry(() => evaluate("document.querySelector('.download-instructions pre')?.textContent.includes('ollama pull qwen3.8:27b')"),'根据用户当前模型显示 Ollama 下载指令'))
   console.log('[PASS] 用户选择 Mac/64GB/Qwen3.8 后得到精确 Ollama 下载命令')
 
+  // Deep link must use visitor-selected settings, not the author's M4/32GB sample.
+  await navigate('/guide/deploy?platform=mac&memory=64&disk=120&model=ltx25-mlx-q4')
+  assert.ok(await retry(() => evaluate("document.querySelector('.selected-summary h3')?.textContent.includes('LTX-2.5') && document.querySelector('.download-instructions pre:last-of-type')?.textContent.includes('hf download dgrauet/ltx-2.5-mlx-q4')"),'URL 中的用户配置未能恢复 LTX 下载命令'))
+  console.log('[PASS] 深层链接恢复访客选择的 Mac / 64GB / LTX Q4 和 HF 下载指令')
+
+  await navigate('/guide/deploy?platform=mac&memory=16&disk=120&model=ltx25-mlx-q4')
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.not-eligible') && !document.querySelector('.download-instructions')"),'低于当前条件时不应直接推荐下载 LTX2.5'))
+  console.log('[PASS] Mac / 16GB 的不适用 LTX2.5 路线不展示直接下载命令')
+
   await navigate('/guide/model-search')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.hub-search form input')"),'官方模型搜索输入框'))
   console.log('[PASS] 实时官方模型搜索入口加载')

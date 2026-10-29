@@ -3,6 +3,7 @@ import type { Theme } from 'vitepress'
 import ModelAdvisor from './components/ModelAdvisor.vue'
 import MacModelAdvisor from './components/MacModelAdvisor.vue'
 import MacGoalAdvisor from './components/MacGoalAdvisor.vue'
+import MacUnifiedWizard from './components/MacUnifiedWizard.vue'
 import NvidiaGoalAdvisor from './components/NvidiaGoalAdvisor.vue'
 import OllamaQuickSteps from './components/OllamaQuickSteps.vue'
 import DeploymentSelection from './components/DeploymentSelection.vue'
@@ -17,6 +18,7 @@ export default {
     app.component('ModelAdvisor', ModelAdvisor)
     app.component('MacModelAdvisor', MacModelAdvisor)
     app.component('MacGoalAdvisor', MacGoalAdvisor)
+    app.component('MacUnifiedWizard', MacUnifiedWizard)
     app.component('NvidiaGoalAdvisor', NvidiaGoalAdvisor)
     app.component('OllamaQuickSteps', OllamaQuickSteps)
     app.component('DeploymentSelection', DeploymentSelection)

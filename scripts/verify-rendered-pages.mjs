@@ -4,8 +4,8 @@ import { join } from 'node:path'
 
 const root = 'docs/.vitepress/dist'
 const cases = [
-  {route:'recommend/',markers:['运行平台','统一内存','模型权重','模型容量初筛推荐结果']},
-  {route:'mac/recommend/',markers:['芯片系列','统一内存','模型权重','模型容量初筛推荐结果']},
+  {route:'recommend/',markers:['运行平台','统一内存','模型权重','当前硬件的模型推荐结果']},
+  {route:'mac/recommend/',markers:['芯片系列','统一内存','模型权重','当前硬件的模型推荐结果']},
   {route:'guide/start',markers:['我的电脑','想运行什么','确认电脑配置']}
 ]
 

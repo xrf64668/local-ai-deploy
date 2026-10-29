@@ -113,5 +113,11 @@ try {
   if (ws && ws.readyState === WebSocket.OPEN) ws.close()
   if (chrome) chrome.kill('SIGTERM')
   if (preview) preview.kill('SIGTERM')
-  rmSync(profile,{recursive:true,force:true})
+  // Chrome may still be flushing its profile after SIGTERM. Never fail a passed UI test just because cleanup races.
+  await sleep(600)
+  try {
+    rmSync(profile,{recursive:true,force:true,maxRetries:12,retryDelay:200})
+  } catch (error) {
+    console.warn('[WARN] 临时 Chrome 配置清理失败：', error.message)
+  }
 }

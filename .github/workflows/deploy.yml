@@ -33,6 +33,8 @@ jobs:
         run: npm ci
       - name: Build VitePress
         run: npm run docs:build
+      - name: Verify interactive model selector in Chrome
+        run: node scripts/smoke-model-advisor.mjs
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

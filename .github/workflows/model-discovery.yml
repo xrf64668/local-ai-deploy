@@ -1,6 +1,12 @@
 name: Discover upstream models (review only)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/model-discovery.yml'
+      - 'scripts/model-discovery.mjs'
+      - 'data/model-discovery/watchlist.json'
   workflow_dispatch:
   schedule:
     # Weekly to limit API traffic; UTC. Produces an artifact, never auto-publishes recommendations.

@@ -24,6 +24,7 @@ const selected=computed(()=>options.value.find(m=>m.id===modelId.value))
 const video=computed(()=>selected.value?.kind==='video'?videoRecommendations({platform:platform.value,memoryGb:memory.value,vramGb:vram.value,diskGb:disk.value}).find(m=>m.model.id===modelId.value):null)
 const ollama=computed(()=>selected.value?.kind==='llm'?shortlistOllama({platform:platform.value,memoryGb:memory.value,vramGb:vram.value}).rows.find(m=>m.model.id===modelId.value):null)
 const ready=computed(()=>Boolean(platform.value&&selected.value&&memory.value>0&&(platform.value==='mac'||vram.value>0)&&(selected.value.kind!=='video'||disk.value>0)))
+const canProceed=computed(()=>ready.value && (selected.value?.kind==='video'?video.value?.eligible:ollama.value?.tier!=='over'))
 const status=computed(()=>{
  if(!ready.value)return '请选择系统、硬件与模型，才能得到基于当前访客配置的判断'
  if(video.value){return video.value.eligible?'达到上游参考起点，可进行真实部署验证':'尚未满足当前目录所列的硬件/磁盘参考要求'}
@@ -74,7 +75,7 @@ const downloadCommand=computed(()=>{
  }
  return (network.value==='mirror'?'HF_ENDPOINT=https://hf-mirror.com ':'')+'hf download '+repo+' --local-dir "$PROJECT_ROOT/models/'+dir+'"'
 })
-watch([platform,purpose],()=>{modelId.value='';copied.value=false})
+watch([platform,purpose],()=>{modelId.value='';copied.value=false},{flush:'sync'})
 onMounted(()=>{
  const q=new URLSearchParams(window.location.search)
  const p=q.get('platform')
@@ -127,7 +128,8 @@ async function copyCommand(){
    <p v-if="ollama">模型包约 {{ollama.weightGiB}} GiB；加上规划余量后约 {{ollama.planningGiB}} GiB，预算剩余约 {{ollama.remainingGiB}} GiB。此数值不是实测峰值。</p>
    <p v-if="ready && (video?.eligible||ollama?.tier!=='over')">你可以继续尝试部署。<strong>满足容量初筛不等于通过真实推理。</strong></p>
   </div>
-  <div v-if="selected && ready" class="download-instructions">
+  <p v-if="selected && ready && !canProceed" class="not-eligible">当前模型超出本站选用的硬件或磁盘参考条件，不作为这一配置的直接下载推荐。请调整实际容量、量化版本或选择更小模型；CPU 卸载、多卡等专用路线需要另外核实。</p>
+  <div v-if="selected && canProceed" class="download-instructions">
    <h3>06 · 按当前选择执行下载</h3>
    <p v-if="selected.kind==='llm'">先根据 <a :href="withBase(specificGuide)">对应系统的 Ollama 安装步骤</a> 安装软件。Ollama 自行管理模型目录，下面的命令不用在 Python venv 中执行。</p>
    <p v-else-if="setup">先在自己选择的专用目录打开终端，准备本项目独立的下载器。首次运行以下准备命令需要网络和兼容的 Python。</p>
@@ -152,5 +154,5 @@ async function copyCommand(){
 .selected-summary h3{margin:0}.selected-summary p{margin:.55rem 0}
 .download-instructions pre{overflow-x:auto;background:var(--vp-code-block-bg);padding:1rem;border-radius:9px;font-size:.84rem;white-space:pre-wrap;overflow-wrap:anywhere}
 .copy-command{border:1px solid var(--vp-c-brand-1);color:var(--vp-c-brand-1);padding:.55rem .9rem;border-radius:8px;cursor:pointer}
-.fine{font-size:.86rem;color:var(--vp-c-text-2)}
+.fine{font-size:.86rem;color:var(--vp-c-text-2)}.not-eligible{border-left:3px solid var(--vp-c-danger-1);padding:.85rem 1rem;background:var(--vp-c-bg-soft)}
 </style>

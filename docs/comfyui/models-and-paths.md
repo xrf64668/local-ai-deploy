@@ -18,28 +18,28 @@ ComfyUI 是一个运行工作流的工具，**安装 ComfyUI 不等于下载好�
 
 | 常见目录 | 放什么 |
 | --- | --- |
-| \`models/checkpoints/\` | 某些完整 Checkpoint 模型 |
-| \`models/diffusion_models/\` | 独立扩散模型权重 |
-| \`models/vae/\` | 对应的图像/视频 VAE |
-| \`models/loras/\` | LoRA 权重 |
-| \`models/text_encoders/\` | 文本编码器 |
-| \`models/controlnet/\` | 相关 ControlNet 权重 |
-| \`custom_nodes/\` | 自定义节点的**程序代码**，不是模型权重目录 |
+| `models/checkpoints/` | 某些完整 Checkpoint 模型 |
+| `models/diffusion_models/` | 独立扩散模型权重 |
+| `models/vae/` | 对应的图像/视频 VAE |
+| `models/loras/` | LoRA 权重 |
+| `models/text_encoders/` | 文本编码器 |
+| `models/controlnet/` | 相关 ControlNet 权重 |
+| `custom_nodes/` | 自定义节点的**程序代码**，不是模型权重目录 |
 
 **目录名称相同不意味着模型必然兼容。** 模板要求哪个文件，就按照它所使用的加载器选择目录。
 
 ## 03 · 找到当前 ComfyUI 真正使用的模型文件夹
 
 - **Desktop：** 通过应用的设置查看实际配置的数据、模型路径。不要假设它与手动版相同。
-- **Mac 手动版：** [手动安装教程](/comfyui/mac-manual)中的 \`src/models/\` 位于你自己选择的 ComfyUI 项目目录内。
-- **Ubuntu 手动版：** 当前教程的 \`src/models/\` 在你的 \`comfyui-local\` 项目文件夹下。
-- **Windows 手动版：** 当前教程的 \`src\models\\\` 在 Windows 对应的项目目录下。
+- **Mac 手动版：** [手动安装教程](/comfyui/mac-manual)中的 `src/models/` 位于你自己选择的 ComfyUI 项目目录内。
+- **Ubuntu 手动版：** 当前教程的 `src/models/` 在你的 `comfyui-local` 项目文件夹下。
+- **Windows 手动版：** 当前教程的 `src\models\\` 在 Windows 对应的项目目录下。
 
 如果你修改过模型根目录或使用额外模型路径配置，以**当前实例真实配置**为准。
 
 ## 04 · 国外 / 国内应该怎样下载？
 
-**能够访问官方仓库：** 按模板提供的官方模型下载链接操作；单文件可以在 Files 页面下载，大模型或多组件建议用官方 \`hf download\` 工具。
+**能够访问官方仓库：** 按模板提供的官方模型下载链接操作；单文件可以在 Files 页面下载，大模型或多组件建议用官方 `hf download` 工具。
 
 **国内网络：** 能直连优先直连；受限时可根据网络条件使用**科学上网**访问上游官方模型仓库；也可以核对 ModelScope 是否有**完全匹配的具体模型**，或审慎使用第三方 HF 社区镜像。
 

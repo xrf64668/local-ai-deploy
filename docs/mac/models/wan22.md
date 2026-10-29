@@ -10,10 +10,10 @@
 | 本页的 MLX 转换权重 | [Anes1032/Wan2.2-TI2V-5B-mlx-q8](https://huggingface.co/Anes1032/Wan2.2-TI2V-5B-mlx-q8) |
 | 运行工具 | [Blaizzy/mlx-video](https://github.com/Blaizzy/mlx-video) |
 | 下载量级 | 上游模型包约 **19.6GB** |
-| 关键文件 | \`model.safetensors\`、\`t5_encoder.safetensors\`、\`vae.safetensors\`、\`config.json\` |
-| 推理规则 | 宽高通常需为 32 的倍数，帧数满足 \`4n+1\` |
+| 关键文件 | `model.safetensors`、`t5_encoder.safetensors`、`vae.safetensors`、`config.json` |
+| 推理规则 | 宽高通常需为 32 的倍数，帧数满足 `4n+1` |
 
-原版 PyTorch 和本页的 MLX Q8 不是同一个仓库。**只下载 \`model.safetensors\` 不够**，文本编码器、VAE 与配置也需要对应版本。
+原版 PyTorch 和本页的 MLX Q8 不是同一个仓库。**只下载 `model.safetensors` 不够**，文本编码器、VAE 与配置也需要对应版本。
 
 ## 02 · 在 Finder 中选择 Wan 项目文件夹
 
@@ -55,7 +55,7 @@ python -m pip install -U pip huggingface_hub
 hf --help
 ~~~
 
-**成功标志：** \`hf --help\` 正常显示。现在的依赖只安装在 Wan 项目的 \`.venv\`。
+**成功标志：** `hf --help` 正常显示。现在的依赖只安装在 Wan 项目的 `.venv`。
 
 ## 04 · 下载 Wan MLX Q8 权重
 
@@ -68,7 +68,7 @@ hf download Anes1032/Wan2.2-TI2V-5B-mlx-q8 \
   --local-dir "$PROJECT_ROOT/models/wan22-q8"
 ~~~
 
-可在命令中加入从模型历史页复制的真实 \`--revision\` SHA 锁定版本。
+可在命令中加入从模型历史页复制的真实 `--revision` SHA 锁定版本。
 
 ### 国内网络：按来源优先级选择
 
@@ -97,7 +97,7 @@ python -m pip install "git+https://github.com/Blaizzy/mlx-video.git"
 python -m mlx_video.wan_2.generate --help
 ~~~
 
-**成功标志：** 安装完成并能看到视频生成参数说明。项目的 Python 模块路径可能随版本变化；**如果 \`--help\` 不存在，请先核对所安装的 Commit 和上游 README，而不是继续尝试生成**。
+**成功标志：** 安装完成并能看到视频生成参数说明。项目的 Python 模块路径可能随版本变化；**如果 `--help` 不存在，请先核对所安装的 Commit 和上游 README，而不是继续尝试生成**。
 
 可记录安装版本：
 
@@ -107,7 +107,7 @@ python -m pip show mlx-video
 
 ## 06 · 生成第一段低负载测试视频
 
-先确认 \`--help\` 包含这些参数，再根据上游格式尝试：
+先确认 `--help` 包含这些参数，再根据上游格式尝试：
 
 ~~~bash
 python -m mlx_video.wan_2.generate \
@@ -118,7 +118,7 @@ python -m mlx_video.wan_2.generate \
   --output-path "$PROJECT_ROOT/outputs/wan-first.mp4"
 ~~~
 
-这里使用的是**低负载实验参数**：512×320 均为 32 的倍数，17 帧满足 \`4n+1\`。能否在 32GB 机器上成功取决于当前 mlx-video 实现、模型加载和内存压力，不能提前保证。
+这里使用的是**低负载实验参数**：512×320 均为 32 的倍数，17 帧满足 `4n+1`。能否在 32GB 机器上成功取决于当前 mlx-video 实现、模型加载和内存压力，不能提前保证。
 
 ## 07 · 核对输出结果
 
@@ -127,7 +127,7 @@ ls -lh "$PROJECT_ROOT/outputs/wan-first.mp4"
 ffprobe -v error -show_entries format=duration,size -of json "$PROJECT_ROOT/outputs/wan-first.mp4"
 ~~~
 
-\`ffprobe\` 需要先安装 FFmpeg 工具套件。**成功标志：** 实际视频可解码、可播放，终端没有生成失败信息。若运行失败，保留完整日志、内存信息、模型版本和执行命令。
+`ffprobe` 需要先安装 FFmpeg 工具套件。**成功标志：** 实际视频可解码、可播放，终端没有生成失败信息。若运行失败，保留完整日志、内存信息、模型版本和执行命令。
 
 ## 08 · API 怎么接入？
 

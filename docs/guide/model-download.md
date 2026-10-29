@@ -41,7 +41,7 @@ ollama run qwen2.5:3b
 
 **这三行分别做什么？** 第一行下载模型；第二行确认下载列表；第三行真正运行模型。最后输入一句问题，收到回答才算成功。
 
-模型标签需要从 [官方 Ollama 模型库](https://ollama.com/library/qwen2.5) 核对。Ollama 使用自己的模型存储与下载机制，**不使用**下方的 \`hf download\` 指令来直接管理 Ollama 内置模型。
+模型标签需要从 [官方 Ollama 模型库](https://ollama.com/library/qwen2.5) 核对。Ollama 使用自己的模型存储与下载机制，**不使用**下方的 `hf download` 指令来直接管理 Ollama 内置模型。
 
 ## 04 · Hugging Face：Mac / Ubuntu 下载 MLX 等模型
 
@@ -57,7 +57,7 @@ export HF_HOME="$(pwd -P)/.cache/huggingface"
 hf --help
 ~~~
 
-**成功标志：** \`hf --help\` 能显示命令说明。首次下载安装工具需要有可访问的软件包来源。若 Python 版本与包不兼容，先按官方版本要求调整 Python。
+**成功标志：** `hf --help` 能显示命令说明。首次下载安装工具需要有可访问的软件包来源。若 Python 版本与包不兼容，先按官方版本要求调整 Python。
 
 先下载一个很小的测试文件，确认下载渠道正常：
 
@@ -65,12 +65,12 @@ hf --help
 hf download openai-community/gpt2 config.json --local-dir ./models/download-test
 ~~~
 
-**成功标志：** \`models/download-test/config.json\` 存在。这个文件仅供验证网络，**不是用来生成视频的模型**。
+**成功标志：** `models/download-test/config.json` 存在。这个文件仅供验证网络，**不是用来生成视频的模型**。
 
-下载真实 LTX / Wan 时使用对应模型页的**完整仓库 ID**和专门的 \`--local-dir\` 路径。对需要同意许可协议的模型，先到 Hugging Face 原仓库登录并获得访问权限，再在本机运行 \`hf auth login\`。访问受限时可能需要科学上网。
+下载真实 LTX / Wan 时使用对应模型页的**完整仓库 ID**和专门的 `--local-dir` 路径。对需要同意许可协议的模型，先到 Hugging Face 原仓库登录并获得访问权限，再在本机运行 `hf auth login`。访问受限时可能需要科学上网。
 
 ::: details 下载时怎么固定版本？
-在 Hugging Face 的 Files / History 页面复制对应的 **Commit SHA**，下载时加 \`--revision <实际的Commit SHA>\`。这样下次重新部署不会意外得到更新后的文件版本。不要直接复制网页示例中的尖括号占位符。
+在 Hugging Face 的 Files / History 页面复制对应的 **Commit SHA**，下载时加 `--revision <实际的Commit SHA>`。这样下次重新部署不会意外得到更新后的文件版本。不要直接复制网页示例中的尖括号占位符。
 :::
 
 ## 05 · 国内下载：ModelScope 和 Hugging Face 镜像
@@ -107,11 +107,11 @@ hf download openai-community/gpt2 config.json --local-dir .\models\mirror-test
 Remove-Item Env:HF_ENDPOINT
 ~~~
 
-如果不使用镜像，确保已取消之前设置的 \`HF_ENDPOINT\`，再从官方源下载。**不要把镜像地址永久写进全局环境配置**，避免影响其他项目。
+如果不使用镜像，确保已取消之前设置的 `HF_ENDPOINT`，再从官方源下载。**不要把镜像地址永久写进全局环境配置**，避免影响其他项目。
 
 ## 06 · Windows 手动下载 Hugging Face 模型
 
-先用资源管理器新建模型项目目录，打开 PowerShell，通过 \`cd\` 进入该目录。若已安装兼容 Python：
+先用资源管理器新建模型项目目录，打开 PowerShell，通过 `cd` 进入该目录。若已安装兼容 Python：
 
 ~~~powershell
 py -3 -m venv .download-venv
@@ -120,7 +120,7 @@ $env:HF_HOME = (Join-Path (Get-Location).Path '.cache\huggingface')
 .\.download-venv\Scripts\hf.exe download openai-community/gpt2 config.json --local-dir .\models\download-test
 ~~~
 
-如果最后一行找不到 \`hf.exe\`，请先检查前面的安装日志和实际虚拟环境中生成的命令位置。下载正式模型时，将测试仓库 ID 换成**目标平台支持的实际仓库 ID**。
+如果最后一行找不到 `hf.exe`，请先检查前面的安装日志和实际虚拟环境中生成的命令位置。下载正式模型时，将测试仓库 ID 换成**目标平台支持的实际仓库 ID**。
 
 ## 07 · 下载后怎样检查？
 

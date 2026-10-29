@@ -49,7 +49,7 @@ ollama list
 
 ### 路线 B · Hugging Face 官方权重
 
-先按照 [跨系统下载指南](/guide/model-download) 安装官方 \`hf\` 下载工具，并在项目目录配置 \`HF_HOME\`。例如 LTX 和 Wan 使用以下两个**不同的仓库**：
+先按照 [跨系统下载指南](/guide/model-download) 安装官方 `hf` 下载工具，并在项目目录配置 `HF_HOME`。例如 LTX 和 Wan 使用以下两个**不同的仓库**：
 
 - [LTX-2.5 Q4 的下载命令与安装过程](/mac/models/ltx25)
 - [Wan2.2 Q8 的下载命令与安装过程](/mac/models/wan22)
@@ -67,11 +67,11 @@ ollama list
 
 1. 到模型发布页面复制仓库和 commit revision，记录到部署日志。
 2. 核对文件清单、文件大小，以及文本编码器、VAE、tokenizer 等辅助组件。
-3. 如果上游提供 SHA-256，使用 \`shasum -a 256 文件名\` 计算并对照。
+3. 如果上游提供 SHA-256，使用 `shasum -a 256 文件名` 计算并对照。
 4. 确认模型实际加载，再运行最小生成任务；**下载成功只是第一步**。
 
 ::: warning 不要自己补造模型配置
-如果缺少 \`config.json\` 或其他文件，先核对是不是下载了错误仓库、错误 revision 或不完整组件。不要拿别的模型配置直接拼在一起。
+如果缺少 `config.json` 或其他文件，先核对是不是下载了错误仓库、错误 revision 或不完整组件。不要拿别的模型配置直接拼在一起。
 :::
 
 **下一步：** [05 · 真实推理验证](/mac/05-verify) · [返回 Mac 部署总览](/mac/)。

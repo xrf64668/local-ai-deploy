@@ -43,28 +43,68 @@ xcode-select -p
 
 如果缺少 Command Line Tools，可以运行 `xcode-select --install` 并按照 macOS 提示完成。Python 版本应该根据实际项目及 PyTorch/MLX 的兼容要求选择，不要直接用系统自带版本赌兼容。
 
-## 第二步：创建独立演示项目
+## 第二步：由你自己选择项目文件夹
 
-下面每行都只在当前文件夹及其新建的 `mac-ai-lab` 子目录内工作。
+**安装在哪里，完全由你决定。** 不强制使用 `mac-ai-lab`，也不需要填写 `/Users/某个人/...` 之类的固定路径。
 
-- `mkdir`：新建文件夹；`cd`：进入文件夹。
-- `venv`：建立项目专属环境；`source`：让当前终端使用它。
-- `print(sys.executable)`：显示当前用的是哪个 Python，方便验收。
+建议先在 Finder 中新建一个**专用、尽量空的项目文件夹**（例如叫“我的本地AI”），可放在内置磁盘或外置 SSD。请不要直接选择整个“下载”目录、用户主目录、系统目录，或其他已经部署好模型的文件夹。
 
-先进入计划存放模型的磁盘目录，再执行：
+### 方式 A · 点击窗口选择（推荐）
+
+打开 Mac 自带的「终端」，复制下面这段**选择目录的命令**：
 
 ```bash
-mkdir -p mac-ai-lab
-cd mac-ai-lab
-PROJECT_ROOT="$(pwd -P)"
-python3 -m venv .venv
-source .venv/bin/activate
-python -c "import sys; print(sys.executable)"
+PROJECT_ROOT=""
+if SELECTED_FOLDER="$(osascript -e 'POSIX path of (choose folder with prompt "请选择专用的 AI 项目文件夹")')" && [ -d "$SELECTED_FOLDER" ]; then
+  cd "$SELECTED_FOLDER" &&
+  PROJECT_ROOT="$(pwd -P)" &&
+  printf '已选择项目目录：%s\n' "$PROJECT_ROOT"
+else
+  echo "已取消或未找到文件夹，请先选择目录，不要继续安装。"
+fi
 ```
 
-**成功标志：** Python 路径位于你的 `mac-ai-lab/.venv/` 下，而不是系统目录。若选定框架要求 Python 3.11 或 3.12，务必先安装对应解释器，再用它创建 venv。
+**命令做什么？** `osascript` 调出 macOS 自带的文件夹选择窗口；`PROJECT_ROOT` 用来记住你选的目录；`cd` 进入它。**这一步不会安装软件或创建模型文件。**
 
-## 第三步：把缓存放进项目
+**成功标志：** 屏幕会显示 `已选择项目目录：...`，路径就是你自己选的位置。点击“取消”后会提示停止，**不要继续后面的安装命令**。
+
+### 方式 B · 用 Finder 拖拽路径（备用）
+
+不想使用文件夹选择窗口，也可以先在终端输入 `cd `（注意末尾有空格），把 Finder 里的项目文件夹**拖进终端窗口**，然后按回车。接着执行：
+
+```bash
+PROJECT_ROOT="$(pwd -P)"
+printf '已选择项目目录：%s\n' "$PROJECT_ROOT"
+```
+
+这样同样会自动获取路径，包含空格或中文的文件夹名称也不需要手动拼接。
+
+### 创建这个目录专属的 Python 环境
+
+**先确认上一步已显示正确目录。** 下面只会在所选项目目录内创建 `.venv`：
+
+```bash
+if [ -z "${PROJECT_ROOT:-}" ] || [ ! -d "$PROJECT_ROOT" ]; then
+  echo "尚未选择有效项目文件夹，请完成上一步。"
+else
+  cd "$PROJECT_ROOT" &&
+  python3 -m venv "$PROJECT_ROOT/.venv" &&
+  source "$PROJECT_ROOT/.venv/bin/activate" &&
+  python -c "import sys; print(sys.executable)"
+fi
+```
+
+- `venv`：建立只属于该项目的 Python 环境。
+- `source`：让当前终端使用它。
+- `print(sys.executable)`：显示当前使用的 Python 位置，方便验收。
+
+**成功标志：** 最后一行 Python 路径位于你自己选择的 `项目文件夹/.venv/`，而不是系统目录。如果没有出现该路径，请先排查，不要继续安装依赖。
+
+若所选框架要求特定 Python 版本，应使用对应版本解释器创建环境。**以后新开终端需要重新进入这个目录并激活环境**；项目搬迁后通常需要重建 `.venv`。
+
+## 第三步：把缓存放进你选择的项目
+
+**请继续使用刚才的同一个终端窗口，并确认已经进入项目目录、激活虚拟环境。** 以下缓存文件夹都创建在所选目录下，不依赖项目名称。
 
 ```bash
 mkdir -p cache/huggingface cache/pip cache/uv cache/xdg cache/tmp

@@ -9,7 +9,7 @@
 - Apple Silicon Mac；在「关于本机」核对芯片与 macOS 版本。
 - Git：用来下载 ComfyUI 的程序代码。
 - Python：用来运行 ComfyUI。请根据当前 ComfyUI/PyTorch 版本选受支持的 Python（示例以已安装的兼容 `python3` 为前提）。
-- 选择一个空间足够的**项目父目录**。下面所有 ComfyUI 文件都会存到这里新建的 `comfyui-local`。
+- 在 Finder 中创建一个你自己命名的**专用项目文件夹**（尽量为空），可放在内置磁盘或外置 SSD。ComfyUI 代码、Python 环境、模型及缓存会以此为安装根目录，不再强制使用 `comfyui-local`。
 
 不认识这些词？查看 [新手术语词典](/comfyui/glossary)。
 
@@ -39,27 +39,56 @@ df -h .
 
 **作用：** 查看当前目录所在磁盘的剩余空间。**成功标志：** 能找到 `Avail`（可用空间）。模型文件可能比 ComfyUI 程序大得多，需预留额外余量。
 
-## 02 · 创建自己的 ComfyUI 文件夹
+## 02 · 由你决定 ComfyUI 安装在哪里
 
-**先在终端进入你打算保存项目的父目录。** 下面命令只在当前位置新建一个文件夹，不会写入其他 AI 部署项目。
+你不必在终端输入一个写死的项目路径。**先在 Finder 新建专用文件夹，再从弹出的窗口中选择它。** 也可以选择外置硬盘上的文件夹。
 
-```bash
-mkdir -p comfyui-local
-```
+::: warning 选择前请确认
+建议使用一个**专用、尽量为空的文件夹**。不要直接选择整个用户主目录、系统目录、已经安装好的其他模型项目目录；本教程会在所选位置创建 `src`、`.venv` 和 `.cache`。
+:::
 
-**含义：** `mkdir` 表示创建文件夹；`-p` 表示文件夹已存在时不报错。**成功标志：** 没有错误提示。
+### 方式 A · 弹出 macOS 文件夹选择窗口（推荐）
 
-```bash
-cd comfyui-local
-```
-
-**含义：** `cd` 表示进入这个文件夹。**成功标志：** 后续命令显示当前目录为 `comfyui-local`。
+在「终端」中执行：
 
 ```bash
-pwd -P
+PROJECT_ROOT=""
+if SELECTED_FOLDER="$(osascript -e 'POSIX path of (choose folder with prompt "请选择专用的 ComfyUI 项目文件夹")')" && [ -d "$SELECTED_FOLDER" ]; then
+  cd "$SELECTED_FOLDER" &&
+  PROJECT_ROOT="$(pwd -P)" &&
+  printf '已选择项目目录：%s\n' "$PROJECT_ROOT"
+else
+  echo "已取消或未找到文件夹，请先选择目录，不要继续安装。"
+fi
 ```
 
-**含义：** 显示当前文件夹的真实路径。记住这个位置；后面模型和虚拟环境都在这里。
+**命令做什么？** `osascript` 调用 macOS 自带的文件夹选择窗口；`cd` 进入用户所选目录；`PROJECT_ROOT` 保存该目录的真实路径。**这里只选路径，不会下载或安装文件。**
+
+**成功标志：** 显示 `已选择项目目录：...`。如果取消选择，则不要继续后面的安装命令。
+
+### 方式 B · 直接把 Finder 文件夹拖进终端
+
+在终端输入 `cd `（后面留一个空格），然后从 Finder 把项目文件夹拖进终端，再按回车。接着执行：
+
+```bash
+PROJECT_ROOT="$(pwd -P)"
+printf '已选择项目目录：%s\n' "$PROJECT_ROOT"
+```
+
+**成功标志：** 打印出的路径就是你准备存放 ComfyUI 的文件夹；路径中可以含中文和空格。
+
+### 再检查一次目标目录
+
+```bash
+if [ -z "${PROJECT_ROOT:-}" ] || [ ! -d "$PROJECT_ROOT" ]; then
+  echo "没有有效的项目目录，请先完成选择。"
+else
+  printf '准备安装到：%s\n' "$PROJECT_ROOT"
+  df -h "$PROJECT_ROOT"
+fi
+```
+
+**确认后才继续下一步。** 后面相对路径 `src/`、`.venv/`、`.cache/` 都是**相对于你选择的项目文件夹**，而不是固定的 `comfyui-local`。
 
 ## 03 · 下载 ComfyUI 程序代码
 
@@ -69,7 +98,7 @@ git clone https://github.com/Comfy-Org/ComfyUI.git src
 
 **含义：** `git clone` 表示从官方 GitHub 仓库复制程序代码；`src` 是你本地的代码文件夹名称。
 
-**成功标志：** 终端出现接收文件和完成的信息，`src` 目录存在。网络失败时先检查连接，不要直接改用不明镜像。
+**成功标志：** 终端出现接收文件和完成的信息，所选项目文件夹下的 `src` 目录存在。网络失败时先检查连接，不要直接改用不明镜像。
 
 ## 04 · 创建独立 Python 环境
 
@@ -89,7 +118,7 @@ source .venv/bin/activate
 python -c "import sys; print(sys.executable)"
 ```
 
-**成功标志：** 输出路径指向 `comfyui-local/.venv/bin/python`，不是系统全局 Python。若失败，暂停检查 Python 版本与 venv 创建日志。
+**成功标志：** 输出路径指向你选择的 `项目文件夹/.venv/bin/python`，不是系统全局 Python。若失败，暂停检查 Python 版本与 venv 创建日志。
 
 ## 05 · 设置项目内缓存
 
@@ -108,7 +137,7 @@ export PYTHONNOUSERSITE=1
 
 **含义：** `PROJECT_ROOT` 是当前项目目录；`export` 是给后续安装与运行命令指定缓存位置。
 
-**成功标志：** 执行 `echo "$HF_HOME"`，路径在你的 `comfyui-local/.cache/` 中。设置变量不会下载任何模型。
+**成功标志：** 执行 `echo "$HF_HOME"`，路径在你选定的 `项目文件夹/.cache/` 中。设置变量不会下载任何模型。
 
 ::: details 看不懂这些缓存变量怎么办？
 - `HF_HOME`：Hugging Face 相关缓存。
@@ -166,7 +195,7 @@ python main.py --listen 127.0.0.1 --port 8188
 
 你可以用 Finder 打开项目目录，但**不要依赖移动后的旧虚拟环境直接运行**。项目移动后应优先重建 `.venv`。
 
-如果项目没有移动，在终端重新进入该项目根目录：
+如果项目没有移动，先用本页第 02 节的**文件夹选择方式**再次进入你之前创建的项目目录（或者从 Finder 拖动该文件夹到 `cd ` 后按回车），然后执行：
 
 ```bash
 source .venv/bin/activate

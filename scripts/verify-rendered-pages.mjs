@@ -8,7 +8,7 @@ const cases = [
   {route:'mac/recommend/',markers:['芯片系列','统一内存','模型权重','当前硬件的模型推荐结果']},
   {route:'ubuntu/',markers:['确认自己的电脑配置','语言模型','视频模型']},
   {route:'windows/',markers:['确认自己的电脑配置','图像模型','语音识别']},
-  {route:'ubuntu/chat',markers:['Ubuntu 语言模型','安装 Ollama','第一次本地聊天']},
+  {route:'ubuntu/chat',markers:['Ubuntu 语言模型','安装 Ollama','从官方模型库下载并运行']},
   {route:'ubuntu/image',markers:['Ubuntu 图像模型','ComfyUI','第一次生成']},
   {route:'ubuntu/video',markers:['Ubuntu 视频模型','LTX','Wan']},
   {route:'ubuntu/audio',markers:['Ubuntu 语音识别','whisper.cpp','转写自己的音频']},

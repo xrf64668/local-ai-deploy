@@ -4,6 +4,8 @@
 
 <MacUnifiedWizard />
 
+**工程质量标准：**[V2 模型部署与工程验收规范](/contribute/v2-deployment-standard)。未通过核验的部署方案不能标记为已验证。
+
 ## 关于当前 V2 的支持情况
 
 - **语言模型**：已整合 Ollama 的容量初筛、模型选择、安装、下载、运行以及可选的 HTTP API 检查，步骤可直接在本页操作。

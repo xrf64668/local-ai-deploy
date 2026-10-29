@@ -8,16 +8,22 @@
 
 ## 交互式硬件容量计算器
 
-<ClientOnly>
-  <ModelAdvisor />
-  <template #fallback>
-    <div class="calculator-load-fallback">
-      <strong>正在加载交互式计算面板…</strong>
-      <p>如果此提示一直存在，请刷新页面，并确认浏览器允许本站运行 JavaScript。也可以先使用下面对应系统的设备选型入口。</p>
-      <p><a href="/local-ai-deploy/mac/">Mac 选型</a> · <a href="/local-ai-deploy/ubuntu/">Linux 选型</a> · <a href="/local-ai-deploy/windows/">Windows 选型</a></p>
-    </div>
-  </template>
-</ClientOnly>
+
+::: details 计算面板没有显示？点击查看
+计算器应该显示在本段说明的**正下方**。如果这里只有空白，可能是浏览器缓存了旧版脚本、网络加载失败，或浏览器扩展影响了脚本。
+
+建议先按 **Mac：⌘ + Shift + R**、**Windows/Linux：Ctrl + Shift + R** 强制刷新。如果仍然空白，换一个浏览器窗口或暂时禁用可能干扰网页的扩展，再重新打开此页面。
+
+也可以先从下面的入口选自己的设备，不影响继续学习：
+- [Mac：按硬件选择模型](/mac/)
+- [Ubuntu / Linux：按 NVIDIA 显存选择模型](/ubuntu/)
+- [Windows：按 NVIDIA 显存选择模型](/windows/)
+
+如果持续无法加载，欢迎到 [GitHub Issues](https://github.com/xrf64668/local-ai-deploy/issues/new) 反馈浏览器版本和截图（请不要上传私人路径或密钥）。
+:::
+
+<ModelAdvisor />
+
 
 ::: details 进阶：计算依据、适用边界与结果解释
 - **语言模型：** 使用真实 Ollama 模型标签的公开下载量、上下文和保护性工作区余量进行容量初筛；传统 Qwen2.5 Transformer 还能展开查看权重、KV 缓存的详细估算。

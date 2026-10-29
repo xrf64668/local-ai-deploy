@@ -85,7 +85,7 @@ try {
   assert.ok(await retry(() => evaluate("!!document.querySelector('.calculator') && !!document.querySelector('.verdict')"), '计算器显示'))
   assert.ok(await evaluate("document.body.innerText.includes('不同厂商的本地模型推荐') && !!document.querySelector('.catalog-card')"),'初始跨厂商模型推荐未显示')
   console.log('[PASS] 浏览器显示 Mac 默认容量计算器')
-  assert.ok(await evaluate("!!document.querySelector('.calculator') && !document.querySelector('.calculator-load-fallback')"),'客户端加载完成后不应仍显示计算器加载兜底')
+  assert.ok(await evaluate("!!document.querySelector('.calculator') && !!document.querySelector('details.custom-block.details')"),'交互面板及固定排障入口都应存在')
   console.log('[PASS] 计算面板正常挂载并替换加载兜底')
 
   const selectedPlatform = await evaluate(`(() => {

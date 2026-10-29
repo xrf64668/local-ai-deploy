@@ -1,0 +1,34 @@
+name: Discover upstream models (review only)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly to limit API traffic; UTC. Produces an artifact, never auto-publishes recommendations.
+    - cron: '19 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run metadata discovery tests
+        run: node --test tests/model-discovery.test.mjs
+      - name: Discover public model metadata
+        run: node scripts/model-discovery.mjs
+      - name: Upload review-only discovery report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-discovery-candidates
+          path: artifacts/model-discovery.json
+          if-no-files-found: warn
+          retention-days: 21

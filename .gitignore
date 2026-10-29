@@ -6,3 +6,6 @@ docs/.vitepress/cache/
 .idea/
 .env
 .env.*
+
+# Generated upstream discovery snapshots (Actions artifacts, not curated recommendations)
+/artifacts/

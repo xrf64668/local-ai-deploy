@@ -30,3 +30,13 @@ npm run docs:dev
 内容规范：[教程编写标准](./docs/contribute/writing-standard.md)。发现问题请通过 [Issues](https://github.com/xrf64668/local-ai-deploy/issues) 反馈。
 
 许可证：[LICENSE](./LICENSE)。
+
+## 模型数据库自动维护
+
+仓库已包含**只读元数据发现**工作流，每周检查 Hugging Face Hub 的指定模型/关键词，并将未验证候选作为 GitHub Actions artifact 供审核。**不会自动下载权重或将未经审核的模型写入正式推荐**。
+
+- [模型发现、审核与真实设备数据规范](https://xrf64668.github.io/local-ai-deploy/contribute/model-lifecycle)
+- [手动运行或查看模型发现工作流](https://github.com/xrf64668/local-ai-deploy/actions/workflows/model-discovery.yml)
+- [提交脱敏的模型实测报告](https://github.com/xrf64668/local-ai-deploy/issues/new?template=model-benchmark.yml)
+
+在仓库根目录执行 `npm run models:test` 进行离线测试；执行 `npm run models:discover` 查询 Hugging Face 的公开 API（需能够联网）。

@@ -1,0 +1,64 @@
+name: "提交本地模型实测记录"
+description: "自愿分享脱敏的设备、模型版本、运行参数与验证结果，供审核后加入兼容性数据集。"
+title: "[实测] 模型名称 - 系统/硬件"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请勿上传访问令牌、用户名、个人目录、网络地址或包含隐私的提示词。社区报告在审核前只标记为“用户自报”，不会直接成为“已验证兼容”。
+  - type: dropdown
+    id: platform
+    attributes:
+      label: "运行系统"
+      options: ["macOS Apple Silicon","Ubuntu NVIDIA","Windows NVIDIA","其他"]
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: "芯片 / GPU 与可用内存"
+      placeholder: "例如 Apple M4 / 32 GiB 或 NVIDIA RTX 4090 / 24 GiB"
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: "模型仓库与精确 revision / 量化格式"
+      placeholder: "例如 owner/repo@<真实 commit SHA> / MLX Q4"
+    validations:
+      required: true
+  - type: input
+    id: runtime
+    attributes:
+      label: "运行时名称及版本或 Git Commit"
+      placeholder: "例如 ltx-2-mlx + Git Commit"
+    validations:
+      required: true
+  - type: textarea
+    id: invocation
+    attributes:
+      label: "具体运行参数（请脱敏）"
+      description: "模型分辨率、帧数、上下文、批次、步数或并发数；不要包含用户路径或原始私人提示词。"
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: "结果"
+      options: ["PASS：真实生成成功","FAIL：无法加载","FAIL：推理中断 / 内存不足","PARTIAL：只启动或加载，还没有生成"]
+    validations:
+      required: true
+  - type: textarea
+    id: metrics
+    attributes:
+      label: "实测数据及证据"
+      description: "建议提供峰值内存/显存、耗时、输出类型、FFprobe 摘要或脱敏日志。未测到的项目请注明，不要估算后填“实测”。"
+    validations:
+      required: true
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: "授权与隐私确认"
+      options:
+        - label: "我已移除私人信息、访问令牌和本机绝对路径，同意该记录被审核并用于公开兼容性资料。"
+          required: true

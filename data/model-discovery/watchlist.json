@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "description": "只检索元数据；查询到的模型默认未经适配验证，不自动进入推荐库。",
+  "repositories": [
+    {
+      "id": "Qwen/Qwen3.8-27B",
+      "publisher": "official"
+    },
+    {
+      "id": "dgrauet/ltx-2.5-mlx-q4",
+      "publisher": "community-conversion"
+    },
+    {
+      "id": "Anes1032/Wan2.2-TI2V-5B-mlx-q8",
+      "publisher": "community-conversion"
+    }
+  ],
+  "searches": [
+    {
+      "query": "Qwen3.8",
+      "limit": 8
+    },
+    {
+      "query": "LTX-2.5",
+      "limit": 8
+    },
+    {
+      "query": "Wan2.2",
+      "limit": 8
+    }
+  ]
+}

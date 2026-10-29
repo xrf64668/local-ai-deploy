@@ -7,8 +7,10 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "predocs:build": "node --test tests/model-memory.test.mjs tests/model-video.test.mjs tests/ollama-catalog.test.mjs",
-    "postdocs:build": "node scripts/verify-rendered-pages.mjs"
+    "predocs:build": "node --test tests/model-memory.test.mjs tests/model-video.test.mjs tests/ollama-catalog.test.mjs tests/model-discovery.test.mjs",
+    "postdocs:build": "node scripts/verify-rendered-pages.mjs",
+    "models:discover": "node scripts/model-discovery.mjs",
+    "models:test": "node --test tests/model-discovery.test.mjs"
   },
   "devDependencies": {
     "vitepress": "1.6.4",

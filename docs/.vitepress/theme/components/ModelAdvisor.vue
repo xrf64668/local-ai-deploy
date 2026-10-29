@@ -2,6 +2,7 @@
 import {computed,ref} from 'vue'
 import {withBase} from 'vitepress'
 import {MODEL_PROFILES,QUANTIZATION,estimateLLM,assessBudget,round2} from '../../data/model-memory.mjs'
+import {videoRecommendations} from '../../data/model-video.mjs'
 
 const props=defineProps({
   initialPlatform:{type:String,default:'mac'},
@@ -12,6 +13,7 @@ const chip=ref('M4')
 const task=ref('llm')
 const memory=ref(32)
 const vram=ref(12)
+const freeDisk=ref(120)
 const reserve=ref(4)
 const gpuReserve=ref(1.5)
 const quant=ref('q4')
@@ -41,6 +43,9 @@ const selected=computed(()=>results.value.find(r=>r.model.id===selectedId.value)
 const candidates=computed(()=>results.value
   .filter(r=>r.model.id!=='custom' && !r.error && r.budget.tier!=='exceeds')
   .sort((a,b)=>b.model.paramsB-a.model.paramsB))
+const videoRows=computed(()=>videoRecommendations({platform:platform.value,memoryGb:Number(memory.value),vramGb:Number(vram.value),diskGb:Number(freeDisk.value)}))
+const videoCandidates=computed(()=>videoRows.value.filter(row=>row.eligible))
+const videoUnavailable=computed(()=>videoRows.value.filter(row=>!row.eligible))
 const taskRoutes=computed(()=>{
   const p=platform.value
   if(task.value==='image')return {title:'ComfyUI：首次安装并生成图片',primary:p==='mac'?'/comfyui/mac':p==='ubuntu'?'/comfyui/ubuntu':'/comfyui/windows',secondary:'/comfyui/first-workflow',note:'图像峰值显存依赖工作流、分辨率、VAE、模型和节点，当前不使用语言模型的 KV 缓存公式计算。'}
@@ -71,7 +76,7 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
         <select v-model="task">
           <option value="llm">大语言模型（容量计算）</option>
           <option value="image">图片生成（部署路线）</option>
-          <option value="video">视频生成（部署路线）</option>
+          <option value="video">视频生成（推荐 LTX / Wan 等模型）</option>
           <option value="audio">语音识别（部署路线）</option>
         </select>
       </label>
@@ -83,6 +88,14 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
       <label v-if="platform!=='mac'">NVIDIA 显存
         <select v-model.number="vram">
           <option v-for="n in [0,4,6,8,10,12,16,20,24,32,48,64,80]" :key="n" :value="n">{{ n }} GB</option>
+        </select>
+      </label>
+    </div>
+
+    <div v-if="task==='video'" class="controls secondary">
+      <label>预计可用磁盘空间
+        <select v-model.number="freeDisk">
+          <option v-for="n in [20,30,40,60,80,100,120,160,256,512]" :key="n" :value="n">{{ n }} GB</option>
         </select>
       </label>
     </div>
@@ -175,6 +188,42 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
       <p class="fine">其他模型的权重使用量化估算，不会套用你为当前模型填写的实际文件大小。显存预算不足意味着**不能按当前假设全部放入 GPU**，并不等于 CPU/显存混合运行绝对不可能。</p>
       <p class="next"><a :href="withBase(deployment)">按照本机平台进入 Ollama 安装教程 →</a></p>
     </template>
+    <template v-else-if="task==='video'">
+      <h3>根据当前配置推荐的视频模型（{{ videoCandidates.length }}）</h3>
+      <p class="fine">已结合系统、统一内存或显存、系统内存及可用磁盘筛选具体的 LTX / Wan 模型版本。推荐依据来自上游适配说明，<strong>不是通过 LLM KV 公式计算视频峰值内存</strong>。</p>
+      <div v-if="videoCandidates.length" class="video-models" aria-label="LTX 与 Wan 视频模型推荐结果">
+        <article v-for="row in videoCandidates" :key="row.model.id" class="video-model-card">
+          <div class="video-title">
+            <h4>{{ row.model.title }}</h4>
+            <span class="video-state" :class="row.state">{{ row.status }}</span>
+          </div>
+          <p class="video-backend">{{ row.model.backend }}</p>
+          <p>{{ row.model.rationale }}</p>
+          <dl class="video-specs">
+            <div><dt>模型包下载量</dt><dd>{{ row.model.download }}</dd></div>
+            <div><dt>硬件依据</dt><dd>{{ row.model.memoryReference }}</dd></div>
+            <div><dt>磁盘参考余量</dt><dd>至少 {{ row.model.diskGb }} GB（包含缓存与输出预留）</dd></div>
+          </dl>
+          <p class="fine">{{ row.model.grade }}。实际兼容性还需按具体版本、分辨率和帧数实测。</p>
+          <div class="video-links">
+            <a :href="withBase(row.model.guide)">查看部署教程 →</a>
+            <a :href="row.model.modelUrl" target="_blank" rel="noopener noreferrer">模型来源 ↗</a>
+            <a :href="row.model.evidenceUrl" target="_blank" rel="noopener noreferrer">查看依据 ↗</a>
+          </div>
+        </article>
+      </div>
+      <p v-else class="notice">当前输入的内存、显存和磁盘条件下，目录中暂时没有符合上游参考条件的视频模型。可查看下面的未满足条件说明；这不代表其他高度优化方案完全无法运行。</p>
+      <details v-if="videoUnavailable.length" class="unavailable-models">
+        <summary>查看未满足参考条件的模型（{{ videoUnavailable.length }}）</summary>
+        <div v-for="row in videoUnavailable" :key="row.model.id" class="unavailable-row">
+          <strong>{{ row.model.title }}</strong>
+          <p class="fine">{{ row.reasons.join('；') }}。<a :href="row.model.evidenceUrl" target="_blank" rel="noopener noreferrer">原始资源依据 ↗</a></p>
+        </div>
+      </details>
+      <p class="fine" v-if="platform==='mac'">这里优先列出<strong>原生 MLX</strong> 版本。想通过 ComfyUI 运行视频模型，可另外阅读 <a :href="withBase('/comfyui/mac')">Mac ComfyUI 教程</a>；ComfyUI 的 PyTorch 权重通常不能直接复用这里的 MLX 转换权重。</p>
+      <p class="fine" v-else>这些是 NVIDIA / CUDA 方案，与 Mac 的 MLX 权重不同。可先查看 <a :href="withBase(platform==='windows'?'/comfyui/windows':'/comfyui/ubuntu')">对应系统的 ComfyUI 部署步骤</a>，再按上游模型要求选择工作流。</p>
+      <p class="fine">磁盘余量是留给模型包、缓存和生成文件的保守规划值，<strong>不是模型实际显存峰值</strong>。改变硬件选择后会重新筛选；没有实机日志时不会声称“保证运行”。</p>
+    </template>
     <template v-else>
       <h3>推荐的实际部署路线</h3>
       <p><strong>{{ taskRoutes.title }}</strong></p>
@@ -187,4 +236,5 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
 
 <style scoped>
 .calculator{margin:1.2rem 0 2rem;line-height:1.7}.notice{padding:1rem 1.15rem;border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);border-radius:12px}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.85rem;margin:1.25rem 0}.controls label,.model-label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:600}.controls select,.controls input,.model-label select,.model-label input{width:100%;max-width:100%;border:1px solid var(--vp-c-divider);border-radius:9px;color:var(--vp-c-text-1);background:var(--vp-c-bg);padding:.64rem;font:inherit}.secondary{border-top:1px solid var(--vp-c-divider);padding-top:1rem}.model-label{max-width:450px;margin:.8rem 0}.fine{font-size:.85rem;color:var(--vp-c-text-2);line-height:1.65}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:.7rem;margin:1rem 0}.metrics>div{padding:1rem;border:1px solid var(--vp-c-divider);border-radius:11px;display:flex;flex-direction:column;gap:.25rem}.metrics span{color:var(--vp-c-text-2);font-size:.83rem}.metrics strong{font-size:1.18rem}.metrics .emphasis{background:var(--vp-c-brand-soft);border-color:var(--vp-c-brand-2)}.verdict{font-weight:600;padding:.7rem 1rem;border-left:3px solid var(--vp-c-brand-1);background:var(--vp-c-bg-soft)}.verdict.exceeds{border-left-color:var(--vp-c-danger-1)}.comparison{display:grid;gap:.7rem;margin:1rem 0}.item{border:1px solid var(--vp-c-divider);border-radius:10px;padding:.8rem 1rem}.item-head{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap}.item-head span{font-size:.77rem;color:var(--vp-c-text-2)}.item p{margin:.25rem 0}.next{font-weight:600}.error{color:var(--vp-c-danger-1)}details{border:1px solid var(--vp-c-divider);border-radius:10px;padding:1rem;margin:.7rem 0}summary{cursor:pointer}
+ .video-models{display:grid;gap:1rem;margin:1rem 0}.video-model-card{border:1px solid var(--vp-c-divider);border-radius:13px;padding:1.2rem;background:var(--vp-c-bg-soft)}.video-title{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.65rem}.video-title h4{margin:0;font-size:1.07rem}.video-state{font-size:.79rem;border:1px solid var(--vp-c-divider);border-radius:99px;padding:.2rem .6rem}.video-state.experimental{color:var(--vp-c-warning-1)}.video-backend{font-weight:600;margin:.55rem 0;color:var(--vp-c-text-2)}.video-specs{display:grid;gap:.5rem;margin:.9rem 0}.video-specs div{display:grid;grid-template-columns:minmax(95px,130px) 1fr;gap:.65rem}.video-specs dt{font-size:.87rem;color:var(--vp-c-text-2)}.video-specs dd{margin:0;font-size:.89rem}.video-links{display:flex;gap:1rem;flex-wrap:wrap;font-size:.88rem;font-weight:600}.unavailable-models{margin:1.2rem 0}.unavailable-row{padding:.5rem 0;border-bottom:1px solid var(--vp-c-divider)}.unavailable-row:last-child{border-bottom:0}
 </style>

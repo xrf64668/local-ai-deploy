@@ -42,10 +42,12 @@ KV 字节 = 2 × 层数 × KV头数 × 每头维度
 
 图片生成的峰值还取决于工作流、分辨率、VAE、节点和批大小；视频生成还与帧数、注意力实现及卸载方式有关。语音模型有不同的架构和缓冲需求。
 
-**不能把 LLM 的 KV 公式套在这些任务上。** 目前这些用途提供具体部署路线与验证说明；只有积累带机器、模型版本及生成参数的真实峰值数据后，才提供相应的实测容量区间。
+**不能把 LLM 的 KV 公式套在这些任务上。** 视频模式会基于上游公布的硬件适配起点、所选平台和磁盘空间列出具体 LTX/Wan 候选；此筛选不是视频峰值内存计算。图片和语音继续提供部署路线；后续积累带设备、模型版本、分辨率、帧数与实际峰值的记录后再完善。
 
 ## 怎样把估算变成实测？
 
 运行成功后记录：芯片或 GPU、系统版本、模型 revision、实际权重大小、上下文或图片尺寸、并发、内存峰值、耗时及结果文件。再根据这些记录校准计算模型。
 
 可检查的实现：[计算代码](https://github.com/xrf64668/local-ai-deploy/blob/main/docs/.vitepress/data/model-memory.mjs) · [公式测试](https://github.com/xrf64668/local-ai-deploy/blob/main/tests/model-memory.test.mjs)。
+
+视频候选数据文件：[model-video.mjs](https://github.com/xrf64668/local-ai-deploy/blob/main/docs/.vitepress/data/model-video.mjs) · [视频推荐规则测试](https://github.com/xrf64668/local-ai-deploy/blob/main/tests/model-video.test.mjs)。

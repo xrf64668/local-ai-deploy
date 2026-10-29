@@ -103,6 +103,27 @@ try {
   })()`)
   assert.ok(await retry(() => evaluate("document.querySelector('.verdict')?.textContent.includes('超出当前全 GPU 预算')"), '4GB 显存应显示容量不足'))
   console.log('[PASS] Mac → Ubuntu → 4GB 显存，推荐结果按选项重新计算')
+  // Video task must display actual LTX/Wan candidates, not a generic ComfyUI-only route.
+  await evaluate(`(() => {
+    const platform=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select')
+    platform.value='mac'
+    platform.dispatchEvent(new Event('change',{bubbles:true}))
+    const task=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('模型任务')).querySelector('select')
+    task.value='video'
+    task.dispatchEvent(new Event('change',{bubbles:true}))
+  })()`)
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.video-models') && document.body.innerText.includes('LTX-2.5') && document.body.innerText.includes('Wan2.2 TI2V-5B')"), 'Mac 32GB 的 LTX/Wan 视频模型推荐'))
+  assert.ok(await evaluate("document.querySelectorAll('.video-model-card').length>=2"),'视频推荐候选数量不足')
+  console.log('[PASS] Mac 32GB 展示 LTX-2.5 和 Wan2.2 原生 MLX 候选')
+
+  await evaluate(`(() => {
+    const memory=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存')).querySelector('select')
+    memory.value='16'
+    memory.dispatchEvent(new Event('change',{bubbles:true}))
+  })()`)
+  assert.ok(await retry(() => evaluate("document.querySelectorAll('.video-model-card').length===1 && document.body.innerText.includes('LTX-2.3') && document.querySelector('.unavailable-models')?.textContent.includes('Wan2.2')"),'Mac 16GB 应仅推荐 LTX2.3'))
+  console.log('[PASS] Mac 16GB 不误推荐 LTX2.5/Wan2.2')
+
   await navigate('/mac/recommend/')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.calculator .metrics') && document.body.innerText.includes('芯片系列')"),'Mac 专用计算器'))
   console.log('[PASS] Mac 专用推荐页面显示')

@@ -94,7 +94,7 @@ du -sh "$PROJECT_ROOT/models/wan22-q8/"
 
 ~~~bash
 python -m pip install "git+https://github.com/Blaizzy/mlx-video.git"
-python -m mlx_video.wan_2.generate --help
+python -m mlx_video.models.wan_2.generate --help
 ~~~
 
 **成功标志：** 安装完成并能看到视频生成参数说明。项目的 Python 模块路径可能随版本变化；**如果 `--help` 不存在，请先核对所安装的 Commit 和上游 README，而不是继续尝试生成**。
@@ -110,7 +110,7 @@ python -m pip show mlx-video
 先确认 `--help` 包含这些参数，再根据上游格式尝试：
 
 ~~~bash
-python -m mlx_video.wan_2.generate \
+python -m mlx_video.models.wan_2.generate \
   --model-dir "$PROJECT_ROOT/models/wan22-q8" \
   --prompt "A small bird turns its head gently on a branch" \
   --width 512 --height 320 \

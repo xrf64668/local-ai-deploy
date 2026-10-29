@@ -1,5 +1,7 @@
 # Windows 语音识别：使用 Whisper 转写录音
 
+<DeploymentSelection />
+
 [← 返回 Windows 配置与目标选择](/windows/)
 
 这条路线使用 **whisper.cpp + GGML 多语言模型**。不需要先装 Ollama、ComfyUI 或视频模型。

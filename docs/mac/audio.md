@@ -1,5 +1,7 @@
 # Mac 语音模型：用 Whisper 把录音转成文字
 
+<DeploymentSelection />
+
 **你要完成的事：** 使用开源的 whisper.cpp，在 Mac 本地把音频转换成文字。本页先教**语音识别**，不是语音克隆或语音合成。
 
 [← 返回 Mac 配置与任务选择](/mac/)

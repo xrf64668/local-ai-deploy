@@ -1,5 +1,7 @@
 # Mac LTX-2.3 MLX Q4：较轻的视频模型路线
 
+<DeploymentSelection />
+
 **适合谁：** 想在 Apple Silicon 上尝试视频模型，但统一内存或磁盘不足以优先尝试 LTX-2.5 的读者。LTX-2.3 与 LTX-2.5 是不同版本，不能直接混用模型权重。
 
 [← 返回 Mac 视频选型](/mac/video) · [按 Mac 配置判断](/mac/)

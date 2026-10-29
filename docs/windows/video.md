@@ -1,8 +1,10 @@
 # Windows 视频模型：先确认显存，再选 LTX 或 Wan
 
+<DeploymentSelection />
+
 [← 返回 Windows 配置与目标选择](/windows/)
 
-这条路线针对 **Windows 10/11 64 位 + NVIDIA CUDA GPU**。先填写自己的 RAM、显存和磁盘空间，才能知道哪种视频模型值得进一步尝试。
+这条路线针对 **Windows 10/11 64 位 + NVIDIA CUDA GPU**。如果从 Windows 硬件选择进入，上方已经保留你的 RAM、显存与磁盘输入，**不要回到选型页重复操作**。这里只需继续选择 LTX 或 Wan 的其中一条路线。
 
 ## 01 · 查看显卡与空间
 

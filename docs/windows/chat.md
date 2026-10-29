@@ -1,50 +1,42 @@
-# Windows 语言模型：安装软件、下载、开始聊天
+# Windows 语言模型：一页安装、下载并开始聊天
 
-[← 返回 Windows 配置与目标选择](/windows/)
+**本页连续完成全部操作。** 不需要在容量计算、模型库和 PowerShell 教程之间来回切换。
 
-这条路线只需 Ollama 的 **Windows 安装包**。第一次不必先配置 Git、Python、CUDA 或 HTTP API。
+<DeploymentSelection />
 
-## 01 · 查看配置，选择模型
+## 01 · 查看 Windows 配置
 
-在 Windows「设置 → 系统 → 关于」查看系统内存，在「任务管理器 → 性能 → GPU」查看显卡型号与专用显存。
+打开「设置 → 系统 → 关于」查看 RAM，在「任务管理器 → 性能 → GPU」查看显卡。你在前一页输入的内存、显存和磁盘会显示在本页顶部，不需要重新填写。
 
-回到 [Windows 入口](/windows/) 填入自己的内存、显存和磁盘，选择「语言模型」。先用容量较小的量化模型验证安装过程。
+## 02 · 安装官方 Ollama
 
-## 02 · 下载 Ollama
-
-1. 进入 [Ollama 官方 Windows 下载页](https://ollama.com/download/windows)。
-2. 下载并运行官方安装包，打开 Ollama。
-3. 启动 PowerShell，检查版本：
+1. 打开 [Ollama Windows 官方下载](https://ollama.com/download/windows)。
+2. 下载 Windows 安装包，按向导安装并启动。
+3. 打开 PowerShell：
 
 ```powershell
 ollama --version
 ```
 
-**成功标志：** 打印 Ollama 版本号。
+**成功标志：** 显示版本号。第一次聊天不需要额外安装 Git、Python 或 CUDA Toolkit。
 
-## 03 · 下载第一个模型
+## 03 · 选择模型、下载、检查、运行
 
-在 [Ollama 官方模型库](https://ollama.com/library) 查询准确标签。下面使用轻量教学示例：
+<OllamaQuickSteps platform="windows" />
 
-```powershell
-ollama pull qwen2.5:3b
-ollama list
-```
+如果从网站的 Windows 推荐结果进入，本页已经预先选择那个模型。也可以在此直接调整，然后从上到下运行显示的三条命令。
 
-**成功标志：** 模型列表包含 `qwen2.5:3b`。
+## 04 · 常见问题
 
-如果下载失败，检查网络、模型标签和磁盘空间；官方源访问受限时可根据当地网络条件使用科学上网，不要直接把 Hugging Face 的原始 PyTorch 权重塞进 Ollama 内部目录。
+| 现象 | 处理 |
+| --- | --- |
+| `ollama` 找不到 | 确认程序已经安装并启动，重新打开 PowerShell |
+| 下载出错 | 检查网络、模型标签和磁盘；官方源受限时可根据网络情况使用科学上网 |
+| 显存或内存不足 | 更换上方列表里更小的模型；不能只靠下载大小判断运行能力 |
+| 没有得到回答 | 查看 Ollama 实际运行日志，而不是把下载成功视为部署成功 |
 
-## 04 · 开始聊天
+**完成标准：** `ollama list` 有当前模型，`ollama run` 可以正常回复。
 
-```powershell
-ollama run qwen2.5:3b
-```
-
-输入「请用三句话解释本地部署」，等待实际回答，输入 `/bye` 退出。**下载完成不代表部署完成。**
-
-## 05 · 开发者才需要 HTTP API
-
-确认 Ollama 已启动后可通过 `curl.exe` 调用本机接口；第一次聊天不需要做这一步。
-
-[Windows Ollama API 与故障排查](/windows/ollama) · [模型下载指南](/guide/model-download)
+::: details 进阶：需要 API 或配置其他模型存储位置
+完成首次对话之后，再阅读 [Windows Ollama 技术说明](/windows/ollama)。这些操作不属于新手必经步骤。
+:::

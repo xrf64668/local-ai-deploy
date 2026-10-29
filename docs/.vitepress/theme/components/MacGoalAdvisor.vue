@@ -1,5 +1,5 @@
 <script setup>
-import {computed,ref} from 'vue'
+import {computed,ref,onMounted} from 'vue'
 import {withBase} from 'vitepress'
 import {OLLAMA_MODELS,shortlistOllama} from '../../data/ollama-catalog.mjs'
 import {videoRecommendations} from '../../data/model-video.mjs'
@@ -8,6 +8,7 @@ const chip=ref('')
 const memory=ref(0)
 const disk=ref(0)
 const task=ref('')
+onMounted(()=>{const t=new URLSearchParams(window.location.search).get('task');if(['chat','image','video','audio'].includes(t))task.value=t})
 const tasks=[
  {id:'chat',icon:'Aa',name:'语言大模型',desc:'本地聊天、编程、文档问答',tools:'Ollama · GGUF'},
  {id:'image',icon:'▧',name:'图像生成',desc:'文字生成图片、图片编辑',tools:'ComfyUI · MPS'},
@@ -28,7 +29,10 @@ const videoCandidates=computed(()=>basicReady.value&&task.value==='video'
  ?videoRecommendations({platform:'mac',memoryGb:memory.value,diskGb:disk.value,vramGb:0})
  :[])
 const taskGuide=computed(()=>({chat:'/mac/chat',image:'/mac/image',video:'/mac/video',audio:'/mac/audio'})[task.value]||'/mac/')
-const modelLink=(id)=>withBase('/guide/deploy?'+new URLSearchParams({platform:'mac',memory:String(memory.value),disk:String(disk.value),model:id}).toString())
+const query=(extra={})=>new URLSearchParams({chip:chip.value,memory:String(memory.value),disk:String(disk.value),...extra}).toString()
+const modelLink=(id)=>withBase('/mac/chat?'+query({model:id}))
+const videoLink=(row)=>withBase(row.model.guide+'?'+query({model:row.model.id}))
+const guideLink=computed(()=>withBase(taskGuide.value+'?'+query()))
 const requiredMemory=computed(()=>{
  if(task.value==='video')return '视频模型通常需要更多统一内存及额外的下载空间；这里按已收录模型的参考门槛逐项判断。'
  if(task.value==='image')return 'ComfyUI 在 Mac 上通常通过 MPS 运行，具体模型的内存占用还取决于工作流、分辨率与精度。'
@@ -85,7 +89,7 @@ const requiredMemory=computed(()=>{
     <div v-if="llmCandidates.length" class="mini-list">
      <div v-for="row in llmCandidates" :key="row.model.id" class="mini-item">
       <span><strong>{{row.model.name}}</strong><small>下载约 {{row.model.downloadGB}}GB · 规划约 {{row.planningGiB}}GiB</small></span>
-      <a :href="modelLink(row.model.id)">按这个配置下载 →</a>
+      <a  :href="modelLink(row.model.id)">直接进入下载与运行步骤 →</a>
      </div>
     </div>
     <p v-else class="caution">目前目录没有适合这组内存/磁盘预算的候选，请优先查看轻量量化模型或释放磁盘空间。</p>
@@ -96,7 +100,7 @@ const requiredMemory=computed(()=>{
     <div class="mini-list">
      <div v-for="row in videoCandidates" :key="row.model.id" class="mini-item video">
       <span><strong>{{row.model.title}}</strong><small>{{row.status}} · 下载 {{row.model.download}}</small><small v-if="!row.eligible">{{row.reasons.join('；')}}</small></span>
-      <a v-if="row.eligible" :href="withBase(row.model.guide)">独立教程 →</a>
+      <a v-if="row.eligible" :href="videoLink(row)">直接开始这个模型 →</a>
       <span v-else class="disabled-note">暂不推荐下载</span>
      </div>
     </div>
@@ -109,7 +113,7 @@ const requiredMemory=computed(()=>{
    <template v-else>
     <p>先安装独立的 <strong>whisper.cpp</strong>，下载较小的 GGML 语音模型，再将你自己的音频转换为所需格式并转写。此路线不需要 Ollama、ComfyUI 或视频模型。</p>
    </template>
-   <a :href="withBase(taskGuide)" class="primary-link">进入{{chosen?.name}}完整部署教程 →</a>
+   <a v-if="task==='image'||task==='audio'||(task==='chat'&&!llmCandidates.length)" :href="guideLink" class="primary-link">继续按步骤安装{{chosen?.name}} →</a>
   </div>
  </section>
 </template>

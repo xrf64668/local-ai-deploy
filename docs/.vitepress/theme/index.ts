@@ -4,6 +4,8 @@ import ModelAdvisor from './components/ModelAdvisor.vue'
 import MacModelAdvisor from './components/MacModelAdvisor.vue'
 import MacGoalAdvisor from './components/MacGoalAdvisor.vue'
 import NvidiaGoalAdvisor from './components/NvidiaGoalAdvisor.vue'
+import OllamaQuickSteps from './components/OllamaQuickSteps.vue'
+import DeploymentSelection from './components/DeploymentSelection.vue'
 import DeploymentPathPicker from './components/DeploymentPathPicker.vue'
 import ModelDownloadPlanner from './components/ModelDownloadPlanner.vue'
 import HubModelSearch from './components/HubModelSearch.vue'
@@ -16,6 +18,8 @@ export default {
     app.component('MacModelAdvisor', MacModelAdvisor)
     app.component('MacGoalAdvisor', MacGoalAdvisor)
     app.component('NvidiaGoalAdvisor', NvidiaGoalAdvisor)
+    app.component('OllamaQuickSteps', OllamaQuickSteps)
+    app.component('DeploymentSelection', DeploymentSelection)
     app.component('DeploymentPathPicker', DeploymentPathPicker)
     app.component('ModelDownloadPlanner', ModelDownloadPlanner)
     app.component('HubModelSearch', HubModelSearch)

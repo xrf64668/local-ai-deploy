@@ -1,5 +1,7 @@
 # Mac 部署 Wan2.2 TI2V-5B：MLX Q8 下载与生成
 
+<DeploymentSelection />
+
 **适合：** 熟悉基础安装、希望在 Apple Silicon 上探索文字/图片生成视频的读者。本页为可验证的上游方案，**32GB 统一内存是实验起点，不承诺稳定完成**；模型发布方报告了 64GB Apple Silicon 的实际生成记录。
 
 ## 01 · 先确认你下载的是哪个模型

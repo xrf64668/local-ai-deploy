@@ -1,5 +1,7 @@
 # Ubuntu 语音识别：用 Whisper 把录音变成文字
 
+<DeploymentSelection />
+
 [← 返回 Linux 配置与目标选择](/ubuntu/)
 
 **这不是语音合成或声音克隆。** 第一次只部署 `whisper.cpp` 和较小的多语言 `base` 模型，完成真实语音转写，不需要视频或图像模型。

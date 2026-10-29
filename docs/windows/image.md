@@ -1,5 +1,7 @@
 # Windows 图像模型：用 ComfyUI Desktop 生成第一张图
 
+<DeploymentSelection />
+
 [← 返回 Windows 配置与目标选择](/windows/)
 
 第一次建议使用 **ComfyUI Desktop 图形界面**，而不是从复杂的 Python / CUDA 命令开始。
@@ -27,7 +29,7 @@ nvidia-smi
 
 先打开一个基础文生图模板，再按模板说明下载对应权重。不要凭 `safetensors` 后缀判断它是 Checkpoint 还是 VAE。
 
-[ComfyUI 权重文件夹和下载说明](/comfyui/models-and-paths) · [国内外网络下载](/guide/model-download)
+请优先使用 Desktop 内置模板的模型提示和安装时所选的数据目录。若官方源无法访问，可根据网络条件使用科学上网。
 
 ## 04 · 生成第一张图片
 

@@ -1,12 +1,12 @@
-# Ubuntu 语言模型：先完成一次本地聊天
+# Ubuntu 语言模型：一页完成安装、下载和真实聊天
 
-[← 返回 Linux 配置与目标选择](/ubuntu/)
+本页专门针对 Ubuntu 的 Ollama，**完成全部步骤不需要反复跳转到模型推荐器或下载向导**。
 
-这条路线只需要安装 **Ollama**、下载一个量化语言模型、真实提问。无需安装 ComfyUI、视频模型或额外的 CUDA Toolkit。
+<DeploymentSelection />
 
-## 01 · 检查这台电脑
+## 01 · 检查系统与硬件
 
-在 Ubuntu 终端执行：
+在终端运行：
 
 ```bash
 cat /etc/os-release
@@ -15,44 +15,43 @@ df -h .
 nvidia-smi
 ```
 
-**成功标志：** 能看到系统内存、磁盘剩余空间和 NVIDIA 显卡。若 `nvidia-smi` 报错，先处理驱动问题；无独立 GPU 的 CPU 路线可能可以运行，但不适用本页 GPU 容量估算。
+检查系统内存、磁盘和 GPU。没有 NVIDIA GPU 时，`nvidia-smi` 可能不存在，但 Ollama 的 CPU 路线仍可尝试，速度和内存占用需本机验证。若使用 NVIDIA 加速却读不到显卡，应先修复驱动。
 
-## 02 · 选择模型
+## 02 · 安装 Ollama
 
-先返回 [Linux 入口](/ubuntu/) 输入自己的系统内存和显存，选择「语言模型」。容量推荐仅估算权重和额外预算，不预测运行速度。
-
-新手可以使用 [Ollama 官方 Qwen2.5 3B 标签](https://ollama.com/library/qwen2.5:3b) 验证流程；它不是所有配置的唯一推荐。
-
-## 03 · 安装 Ollama
-
-打开 [官方 Linux 安装说明](https://ollama.com/download/linux)，下载并审阅官方安装脚本：
+从 [Ollama 官方 Linux 下载页](https://ollama.com/download/linux) 获取安装脚本。先保存、审阅，再运行：
 
 ```bash
 curl -fL https://ollama.com/install.sh -o ollama-install.sh
 less ollama-install.sh
 ```
 
-确认脚本来源和内容后，退出阅读器并执行：
+确认来源与内容后，按 `q` 退出阅读器：
 
 ```bash
 sh ollama-install.sh
 ollama --version
 ```
 
-官方安装可能创建系统服务或修改系统目录，和自行隔离 Python 模型项目不同。安装失败时不要在没有检查日志前重复运行。
+**成功标志：** 输出版本号。这个官方安装流程可能创建系统服务；如果没有权限或安装失败，应先查看报错，不要重复覆盖原有系统配置。
 
-## 04 · 从官方模型库下载并运行
+## 03 · 下载并运行你选的模型
 
-```bash
-ollama pull qwen2.5:3b
-ollama list
-ollama run qwen2.5:3b
-```
+<OllamaQuickSteps platform="ubuntu" />
 
-在聊天中输入「请解释本地 AI 是什么」。**真正收到回答才算成功。** 进入其他模型时应统一修改三处标签，并核对上游许可证。
+如果从 Ubuntu 硬件入口选了 Qwen、Gemma、Llama 等型号，它会自动带进上面的模型下拉框。运行后真正得到回答才算成功。
 
-## 05 · 想通过 Java 或其他程序调用？
+## 04 · 失败时如何处理
 
-完成聊天之后再使用 Ollama 自带的本机 HTTP 接口；不要向公网直接暴露无鉴权端口。
+| 现象 | 处理 |
+| --- | --- |
+| 下载失败 | 检查官方标签、磁盘和网络，官方源受限时按网络条件使用科学上网 |
+| `nvidia-smi` 错误 | 检查 NVIDIA 驱动，勿用重复安装 PyTorch 来修复 |
+| 有 GPU 但占用不符合预期 | 在本机查看 Ollama 运行状态，可能使用 CPU 或部分卸载 |
+| 模型回复失败 | 先尝试更小的量化标签，查看实际错误和内存占用 |
 
-[Ubuntu Ollama 完整教程及 API](/ubuntu/ollama) · [国内外下载说明](/guide/model-download)
+**完成标准：** 目标模型出现在 `ollama list`，并且用 `ollama run` 收到文字回答。
+
+::: details 进阶：服务器服务化和 API
+Ubuntu Ollama 的服务管理、HTTP API 与高级调优请参考 [完整技术说明](/ubuntu/ollama)。首次部署不必继续。
+:::

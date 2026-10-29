@@ -1,5 +1,7 @@
 # Ubuntu 图像模型：使用 ComfyUI 生成第一张图
 
+<DeploymentSelection />
+
 [← 返回 Linux 配置与目标选择](/ubuntu/)
 
 图像模型建议通过 **ComfyUI + NVIDIA CUDA** 运行。与视频 LTX/Wan、Ollama 聊天是独立环境，不需要全部安装。
@@ -15,11 +17,46 @@ df -h .
 
 **成功标志：** 能读取 GPU 型号、驱动与显存。驱动不可用时先排障；安装 PyTorch 不会自动修复坏掉的内核驱动。
 
-## 02 · 安装 ComfyUI
+## 02 · 在本页完成 ComfyUI 的安装与启动
 
-Ubuntu 桌面和服务器可以使用**项目内 Python 虚拟环境**。阅读 [Ubuntu ComfyUI 完整安装](/comfyui/ubuntu)，按当前驱动从官方选择正确的 PyTorch CUDA wheel；不要直接安装其他电脑适用的版本。
+先确保 Ubuntu 的系统 Git、Python 和虚拟环境组件可用：
 
-**成功标志：** 本机浏览器显示 ComfyUI 画布。远程服务器优先使用 SSH 端口转发，不要直接公开 8188。
+```bash
+sudo apt update
+sudo apt install -y git python3 python3-venv python3-pip
+```
+
+**安装目录由你决定。** 在你自己新建的空 ComfyUI 项目目录里打开终端，执行：
+
+```bash
+PROJECT_ROOT="$(pwd -P)"
+git clone https://github.com/Comfy-Org/ComfyUI.git "$PROJECT_ROOT/src"
+python3 -m venv "$PROJECT_ROOT/.venv"
+source "$PROJECT_ROOT/.venv/bin/activate"
+export HF_HOME="$PROJECT_ROOT/.cache/huggingface"
+export XDG_CACHE_HOME="$PROJECT_ROOT/.cache/xdg"
+export TORCH_HOME="$PROJECT_ROOT/.cache/torch"
+python -m pip install --upgrade pip
+```
+
+安装**适合当前 NVIDIA 驱动的 CUDA PyTorch**：先打开 [PyTorch 官方安装选择器](https://pytorch.org/get-started/locally/)，选 Linux / Pip / Python / CUDA，再复制对应指令。以下 **CUDA 12.8 仅作条件示例**，并不适用于所有驱动：
+
+```bash
+python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+python -c "import torch; print('CUDA:', torch.cuda.is_available()); print('GPU:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'N/A')"
+```
+
+**成功标志：** 输出 `CUDA: True` 且 GPU 型号正确。若为 False，停止安装并检查驱动和 PyTorch 构建。
+
+```bash
+python -m pip install -r "$PROJECT_ROOT/src/requirements.txt"
+cd "$PROJECT_ROOT/src"
+python main.py --listen 127.0.0.1 --port 8188
+```
+
+桌面 Ubuntu 在本机访问 `http://127.0.0.1:8188`；SSH 远程服务器则从**你自己的电脑**建立 `ssh -L 8188:127.0.0.1:8188 user@your-server` 隧道，并在本地浏览器打开相同地址，不要直接开放公网 8188。
+
+**成功标志：** 画布能打开；这只证明环境启动，下一步才是模型下载和生成。
 
 ## 03 · 从工作流确定下载哪些文件
 

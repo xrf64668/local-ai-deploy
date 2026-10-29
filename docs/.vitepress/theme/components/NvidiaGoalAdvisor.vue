@@ -1,5 +1,5 @@
 <script setup>
-import {computed,ref} from 'vue'
+import {computed,ref,onMounted} from 'vue'
 import {withBase} from 'vitepress'
 import {shortlistOllama} from '../../data/ollama-catalog.mjs'
 import {videoRecommendations} from '../../data/model-video.mjs'
@@ -9,6 +9,7 @@ const systemRam=ref(0)
 const vram=ref(-1)
 const disk=ref(0)
 const purpose=ref('')
+onMounted(()=>{const t=new URLSearchParams(window.location.search).get('task');if(['chat','image','video','audio'].includes(t))purpose.value=t})
 const categoryOptions=[
  {id:'chat',mark:'Aa',title:'语言模型',desc:'聊天、编程、文档问答',backend:'Ollama'},
  {id:'image',mark:'▧',title:'图像模型',desc:'文生图、图像编辑',backend:'ComfyUI + CUDA'},
@@ -19,10 +20,11 @@ const label=computed(()=>props.platform==='ubuntu'?'Ubuntu / NVIDIA':'Windows / 
 const filled=computed(()=>systemRam.value>0&&vram.value>=0&&disk.value>0)
 const choice=computed(()=>categoryOptions.find(x=>x.id===purpose.value))
 const link=computed(()=>withBase('/'+props.platform+'/'+purpose.value))
-function modelLink(id){
- const q=new URLSearchParams({platform:props.platform,memory:String(systemRam.value),vram:String(vram.value),disk:String(disk.value),model:id});
- return withBase('/guide/deploy?'+q.toString());
-}
+function params(extra={}){return new URLSearchParams({memory:String(systemRam.value),vram:String(vram.value),disk:String(disk.value),...extra}).toString()}
+function modelLink(id){return withBase('/'+props.platform+'/chat?'+params({model:id}))}
+function videoLink(id){return withBase('/'+props.platform+'/video?'+params({model:id}))}
+const guideLink=computed(()=>withBase('/'+props.platform+'/'+purpose.value+'?'+params()))
+
 const capacity=computed(()=>filled.value&&purpose.value==='chat'
  ?shortlistOllama({platform:props.platform,memoryGb:systemRam.value,vramGb:vram.value,systemReserveGb:4,gpuReserveGb:Math.max(1,Math.min(3,vram.value*.12))}):null)
 const chatModels=computed(()=>{
@@ -80,7 +82,7 @@ const caveat=computed(()=>{
     <div v-if="vram===0" class="fine">没有 NVIDIA GPU：这条 Ollama 的 CPU-only 方案仍可单独尝试，但速度和内存预算需自己验证；下面不显示 GPU 适配型号。</div>
     <div v-else-if="chatModels.length" class="candidate-list">
      <div v-for="r in chatModels" :key="r.model.id" class="candidate"><span><strong>{{r.model.name}}</strong><small>下载约 {{r.model.downloadGB}}GB · 估算预算 {{r.planningGiB}}GiB</small></span>
-      <a :href="modelLink(r.model.id)">下载路线 →</a>
+      <a :href="modelLink(r.model.id)">直接进入下载与运行步骤 →</a>
      </div>
     </div>
     <p v-else class="warning">已收录的量化模型中，没有满足当前显存及磁盘初筛条件的候选。CPU / 部分卸载方案可能存在，但本站尚未评估该路线。</p>
@@ -90,7 +92,7 @@ const caveat=computed(()=>{
     <div class="candidate-list">
      <div v-for="v in videos" :key="v.model.id" class="candidate">
       <span><strong>{{v.model.title}}</strong><small>{{v.status}}</small><small v-if="!v.eligible">{{v.reasons.join('；')}}</small></span>
-      <a v-if="v.eligible" :href="link">查看对应安装方式 →</a><span v-else class="muted">暂不建议按此路线下载</span>
+      <a v-if="v.eligible" :href="videoLink(v.model.id)">直接进入这条视频路线 →</a><span v-else class="muted">暂不建议按此路线下载</span>
      </div>
     </div>
     <p class="fine">LTX Desktop 的官方推荐配置为 24GB+ 显存、32GB 系统内存和 100GB+ 可用磁盘；符合条件后还需检查实际 GPU 驱动和版本。</p>
@@ -101,7 +103,7 @@ const caveat=computed(()=>{
    <template v-else>
     <p>建议先用 **whisper.cpp** 和较小的多语言 GGML 权重，把一段本地录音转成文字。完成首次识别，再考虑更大模型和 GPU 加速。</p>
    </template>
-   <a v-if="!(vram===0 && (purpose==='image'||purpose==='video'))" class="next-link" :href="link">进入 {{label}} 的{{choice?.title}}部署教程 →</a>
+   <a v-if="(purpose==='image'||purpose==='audio'||(purpose==='chat'&&!chatModels.length)) && !(vram===0 && purpose==='image')" class="next-link" :href="guideLink">继续按步骤安装{{choice?.title}} →</a>
   </div>
  </section>
 </template>

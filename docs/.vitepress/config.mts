@@ -24,42 +24,42 @@ export default defineConfig({
       '/mac/': [
         { text: 'Mac 本地 AI 入门', items: [
           { text: '总览：从哪里开始', link: '/mac/' },
-          { text: '部署路线与目录约定', link: '/mac/roadmap/' }
+          { text: '部署路线与目录约定', link: '/mac/roadmap' }
         ] },
         { text: '01–07 部署实践', collapsed: false, items: [
-          { text: '01 · 硬件与系统检查', link: '/mac/01-preflight/' },
-          { text: '02 · 独立环境与缓存', link: '/mac/02-environment/' },
-          { text: '03 · 选择推理运行时', link: '/mac/03-runtime/' },
-          { text: '04 · 下载模型与锁定版本', link: '/mac/04-models/' },
-          { text: '05 · 真实生成验证', link: '/mac/05-verify/' },
-          { text: '06 · 本地推理与资源控制', link: '/mac/06-inference/' },
-          { text: '07 · HTTP API 接入', link: '/mac/07-api/' }
+          { text: '01 · 硬件与系统检查', link: '/mac/01-preflight' },
+          { text: '02 · 独立环境与缓存', link: '/mac/02-environment' },
+          { text: '03 · 选择推理运行时', link: '/mac/03-runtime' },
+          { text: '04 · 下载模型与锁定版本', link: '/mac/04-models' },
+          { text: '05 · 真实生成验证', link: '/mac/05-verify' },
+          { text: '06 · 本地推理与资源控制', link: '/mac/06-inference' },
+          { text: '07 · HTTP API 接入', link: '/mac/07-api' }
         ] },
         { text: '模型专项', items: [
-          { text: 'Ollama：最简单的本地 API', link: '/mac/models/ollama/' },
-          { text: 'LTX-2.5 · MLX Q4', link: '/mac/models/ltx25/' },
-          { text: 'Wan2.2 · 实验性 MLX', link: '/mac/models/wan22/' }
+          { text: 'Ollama：最简单的本地 API', link: '/mac/models/ollama' },
+          { text: 'LTX-2.5 · MLX Q4', link: '/mac/models/ltx25' },
+          { text: 'Wan2.2 · 实验性 MLX', link: '/mac/models/wan22' }
         ] },
         { text: '继续学习', items: [
-          { text: 'Mac ComfyUI 安装', link: '/comfyui/mac/' },
-          { text: 'Mac 故障排查', link: '/mac/troubleshooting/' },
+          { text: 'Mac ComfyUI 安装', link: '/comfyui/mac' },
+          { text: 'Mac 故障排查', link: '/mac/troubleshooting' },
           { text: '按硬件选模型', link: '/recommend/' }
         ] }
       ],
       '/comfyui/': [
         { text: 'ComfyUI 新手专区', items: [
           { text: '认识 ComfyUI', link: '/comfyui/' },
-          { text: 'Mac · Apple Silicon', link: '/comfyui/mac/' },
-          { text: 'Ubuntu · NVIDIA', link: '/comfyui/ubuntu/' },
-          { text: 'Windows · NVIDIA', link: '/comfyui/windows/' }
+          { text: 'Mac · Apple Silicon', link: '/comfyui/mac' },
+          { text: 'Ubuntu · NVIDIA', link: '/comfyui/ubuntu' },
+          { text: 'Windows · NVIDIA', link: '/comfyui/windows' }
         ] },
         { text: '第一次完整生成', items: [
-          { text: '第一次生成图片', link: '/comfyui/first-workflow/' },
-          { text: '模型路径与文件说明', link: '/comfyui/models-and-paths/' },
-          { text: '常见问题与排查', link: '/comfyui/troubleshooting/' }
+          { text: '第一次生成图片', link: '/comfyui/first-workflow' },
+          { text: '模型路径与文件说明', link: '/comfyui/models-and-paths' },
+          { text: '常见问题与排查', link: '/comfyui/troubleshooting' }
         ] },
         { text: '进阶与自动化', items: [
-          { text: 'ComfyUI 本地 API', link: '/comfyui/api/' }
+          { text: 'ComfyUI 本地 API', link: '/comfyui/api' }
         ] }
       ],
       '/guide/': [
@@ -84,14 +84,14 @@ export default defineConfig({
       '/ubuntu/': [
         { text: 'Ubuntu NVIDIA', items: [
           { text: 'Ubuntu 主页', link: '/ubuntu/' },
-          { text: 'ComfyUI 安装', link: '/comfyui/ubuntu/' },
+          { text: 'ComfyUI 安装', link: '/comfyui/ubuntu' },
           { text: '按显存推荐模型', link: '/recommend/' }
         ] }
       ],
       '/windows/': [
         { text: 'Windows NVIDIA', items: [
           { text: 'Windows 主页', link: '/windows/' },
-          { text: 'ComfyUI 安装', link: '/comfyui/windows/' },
+          { text: 'ComfyUI 安装', link: '/comfyui/windows' },
           { text: '按显存推荐模型', link: '/recommend/' }
         ] }
       ]

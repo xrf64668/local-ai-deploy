@@ -41,7 +41,7 @@ ollama run 模型名称:标签
 curl -f http://127.0.0.1:11434/api/tags
 ```
 
-然后使用 [07 · Mac API](/mac/07-api/) 中的 `/api/chat` 示例。Ollama 默认端口是 11434；若服务未运行，需要先启动 Ollama 应用，且不要在未检查的情况下改成监听公网。
+然后使用 [07 · Mac API](/mac/07-api) 中的 `/api/chat` 示例。Ollama 默认端口是 11434；若服务未运行，需要先启动 Ollama 应用，且不要在未检查的情况下改成监听公网。
 
 ## 常见问题
 

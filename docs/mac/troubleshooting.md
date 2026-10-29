@@ -27,6 +27,6 @@ df -h .
 
 ## 进一步阅读
 
-- [01 · 硬件预检](/mac/01-preflight/)
-- [05 · 真实推理验证](/mac/05-verify/)
-- [ComfyUI 跨平台常见问题](/comfyui/troubleshooting/)
+- [01 · 硬件预检](/mac/01-preflight)
+- [05 · 真实推理验证](/mac/05-verify)
+- [ComfyUI 跨平台常见问题](/comfyui/troubleshooting)

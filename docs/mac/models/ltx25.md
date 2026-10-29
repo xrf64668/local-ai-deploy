@@ -41,6 +41,6 @@ df -h .
 
 ## API 现状
 
-专用 CLI 不会自动变成视频 HTTP 服务。要接入 Java/移动端，需要按 [07 · API Worker 设计](/mac/07-api/) 封装真实 CLI、任务队列和结果下载；当前不声明存在可直接运行的 LTX API。
+专用 CLI 不会自动变成视频 HTTP 服务。要接入 Java/移动端，需要按 [07 · API Worker 设计](/mac/07-api) 封装真实 CLI、任务队列和结果下载；当前不声明存在可直接运行的 LTX API。
 
-如果只想在 ComfyUI 使用 LTX 工作流，请先核对当前 ComfyUI 节点是否支持你选定的 LTX 权重格式：[ComfyUI Mac 教程](/comfyui/mac/)。
+如果只想在 ComfyUI 使用 LTX 工作流，请先核对当前 ComfyUI 节点是否支持你选定的 LTX 权重格式：[ComfyUI Mac 教程](/comfyui/mac)。

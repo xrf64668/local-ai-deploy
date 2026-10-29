@@ -35,17 +35,17 @@ features:
   - icon: "🖥️"
     title: Ubuntu · NVIDIA
     details: GPU 服务器环境、CUDA 预检、ComfyUI 路线与显存排障。
-    link: /comfyui/ubuntu/
+    link: /comfyui/ubuntu
     linkText: 查看教程
   - icon: "💻"
     title: Windows · NVIDIA
     details: 图形安装与 PowerShell 手动安装，学会检查 CUDA 和模型目录。
-    link: /comfyui/windows/
+    link: /comfyui/windows
     linkText: 查看教程
   - icon: "🔌"
     title: 把模型变成 API
     details: Ollama 原生 HTTP、ComfyUI 异步工作流，以及视频 Worker 的设计边界。
-    link: /mac/07-api/
+    link: /mac/07-api
     linkText: 了解 API
 ---
 
@@ -56,7 +56,7 @@ features:
 | 完全不懂模型和显存 | [本地 AI 基础](/guide/what-is-local-ai) | 知道模型、后端与硬件的关系 |
 | 只有一台 Apple Silicon Mac | [Mac 七阶段](/mac/) | 完成环境检查与一次真实推理 |
 | 想先用节点生成图片 | [ComfyUI 新手入口](/comfyui/) | 运行工作流并生成可打开的文件 |
-| 希望从 Java / Web 调用 | [API 服务化](/mac/07-api/) | 本机请求得到真实模型返回 |
+| 希望从 Java / Web 调用 | [API 服务化](/mac/07-api) | 本机请求得到真实模型返回 |
 | 不知道我的配置适合什么 | [硬件推荐器](/recommend/) | 获得标注了证据等级的候选 |
 
 ::: tip 本站的原则

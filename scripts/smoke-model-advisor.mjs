@@ -83,7 +83,7 @@ try {
   }
   await navigate('/recommend/')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.calculator') && !!document.querySelector('.verdict')"), '计算器显示'))
-  assert.ok(await evaluate("document.body.innerText.includes('模型权重')"),'初始计算结果缺失')
+  assert.ok(await evaluate("document.body.innerText.includes('不同厂商的本地模型推荐') && !!document.querySelector('.catalog-card')"),'初始跨厂商模型推荐未显示')
   console.log('[PASS] 浏览器显示 Mac 默认容量计算器')
   const selectedPlatform = await evaluate(`(() => {
     const label=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台'))
@@ -94,7 +94,7 @@ try {
     return true
   })()`)
   assert.ok(selectedPlatform,'平台选择器不存在')
-  assert.ok(await retry(() => evaluate("document.body.innerText.includes('NVIDIA 显存') && document.body.innerText.includes('独立 GPU 显存')"),'切换到 Ubuntu 的显存输入'))
+  assert.ok(await retry(() => evaluate("document.body.innerText.includes('NVIDIA 显存') && document.body.innerText.includes('使用单张 NVIDIA 显卡的显存预算')"),'切换到 Ubuntu 的显存输入'))
   await evaluate(`(() => {
     const label=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('NVIDIA 显存'))
     const control=label.querySelector('select')
@@ -105,8 +105,10 @@ try {
   console.log('[DEBUG] 4GB 显存渲染状态：'+lowVramDebug)
   assert.ok(await retry(() => evaluate("!!document.querySelector('.recommend-highlight h4') && document.querySelector('.unavailable-models')?.textContent.includes('7B')"), '4GB 显存应出现分档推荐且将 7B 标为容量不足'))
   console.log('[PASS] Mac → Ubuntu → 4GB 显存，推荐结果按选项重新计算')
-  // 2026 多厂商推荐：32GB 显示真实的 Qwen3.8-27B，切换厂商后候选需要改变。
-  assert.ok(await retry(() => evaluate("document.body.innerText.includes('不同厂商的本地模型推荐') && document.body.innerText.includes('Qwen3.8 27B')"),'跨厂商推荐及 Qwen3.8 未显示'))
+  // 2026 跨厂商推荐：默认 Ubuntu 4GB 不应误推荐 Qwen3.8；随后切换 Mac 32GB。
+  assert.ok(await retry(() => evaluate("document.querySelector('.multi-vendor-recommendations .unavailable-models')?.textContent.includes('Qwen3.8 27B')"),'4GB NVIDIA 显存应标记 Qwen3.8 为容量不足'))
+  await evaluate("(() => {const p=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select');p.value='mac';p.dispatchEvent(new Event('change',{bubbles:true}));const r=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存')).querySelector('select');r.value='32';r.dispatchEvent(new Event('change',{bubbles:true}))})()")
+  assert.ok(await retry(() => evaluate("document.body.innerText.includes('不同厂商的本地模型推荐') && document.body.innerText.includes('Qwen3.8 27B')"),'Mac 32GB 跨厂商推荐及 Qwen3.8 未显示'))
   console.log('[PASS] 跨厂商列表包含 Qwen3.8-27B')
   await evaluate("(() => { const x=[...document.querySelectorAll('.multi-vendor-recommendations label')].find(x=>x.textContent.includes('模型厂商')).querySelector('select');x.value='Google';x.dispatchEvent(new Event('change',{bubbles:true})) })()")
   assert.ok(await retry(() => evaluate("document.querySelector('.catalog-cards')?.textContent.includes('Gemma 4') && !document.querySelector('.catalog-cards')?.textContent.includes('Qwen3.8')"),'跨厂商选择后列表未变化'))
@@ -146,7 +148,7 @@ try {
   console.log('[PASS] Mac 16GB 不误推荐 LTX2.5/Wan2.2')
 
   await navigate('/mac/recommend/')
-  assert.ok(await retry(() => evaluate("!!document.querySelector('.calculator .metrics') && document.body.innerText.includes('芯片系列')"),'Mac 专用计算器'))
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.calculator .multi-vendor-recommendations .catalog-card') && document.body.innerText.includes('芯片系列')"),'Mac 专用计算器'))
   console.log('[PASS] Mac 专用推荐页面显示')
   await navigate('/guide/start')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.deployment-picker .selectors')"),'部署路线选择器'))

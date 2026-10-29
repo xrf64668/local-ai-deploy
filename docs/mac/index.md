@@ -7,6 +7,8 @@
 - **想生成图片：** [Mac 安装 ComfyUI](/comfyui/mac) → [首次生成](/comfyui/first-workflow) → [ComfyUI API](/comfyui/api)
 :::
 
+[按芯片、内存和用途筛选 Mac 模型](/mac/recommend/)
+
 ## 路线 A：Mac 01–07 全过程
 
 | 阶段 | 你将完成什么 | 本阶段成功标志 |

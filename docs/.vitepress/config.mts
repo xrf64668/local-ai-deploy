@@ -24,7 +24,8 @@ export default defineConfig({
       '/mac/': [
         { text: 'Mac 本地 AI 入门', items: [
           { text: '总览：从哪里开始', link: '/mac/' },
-          { text: '部署路线与目录约定', link: '/mac/roadmap' }
+          { text: '部署路线与目录约定', link: '/mac/roadmap' },
+          { text: 'Mac 专用模型推荐器', link: '/mac/recommend/' }
         ] },
         { text: '01–07 部署实践', collapsed: false, items: [
           { text: '01 · 硬件与系统检查', link: '/mac/01-preflight' },

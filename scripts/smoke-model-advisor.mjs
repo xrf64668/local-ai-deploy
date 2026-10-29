@@ -174,6 +174,17 @@ try {
   await navigate('/guide/model-search')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.hub-search form input')"),'官方模型搜索输入框'))
   console.log('[PASS] 实时官方模型搜索入口加载')
+
+  // 模拟真实 Hub 搜索响应，检验从结果到显式确认和下载命令的完整交互。
+  await evaluate("(() => {window.fetch = async (url,opts) => {if(String(url).includes('huggingface.co/api/models?')) return {ok:true,json:async()=>[{id:'dgrauet/ltx-2.5-mlx-q4',pipeline_tag:'text-to-video',downloads:100,likes:8}]};throw Error('unexpected network call: '+url)}})()")
+  await evaluate("(() => {const x=document.querySelector('.hub-search form input');x.value='LTX-2.5';x.dispatchEvent(new Event('input',{bubbles:true}));document.querySelector('.hub-search form').dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))})()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.hub-search .result')?.textContent.includes('dgrauet/ltx-2.5-mlx-q4')"),'模型搜索结果没有显示仓库 ID'))
+  await evaluate("document.querySelector('.hub-search .result-actions button').click()")
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.hub-search .follow-on') && !document.querySelector('.hub-search .download-help')"),'未确认仓库就不应直接给下载命令'))
+  await evaluate("(() => {const c=document.querySelector('.hub-search .confirm input');c.checked=true;c.dispatchEvent(new Event('change',{bubbles:true}))})()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.hub-search .download-help pre')?.textContent.includes('hf download dgrauet/ltx-2.5-mlx-q4')"),'用户确认仓库后应显示 Mac 真实下载示例'))
+  console.log('[PASS] 模型搜索 → 查看仓库 → 用户确认 → 生成下载命令')
+
   await navigate('/guide/start')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.deployment-picker .selectors')"),'部署路线选择器'))
   console.log('[PASS] 部署路线向导显示')

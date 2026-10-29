@@ -1,136 +1,113 @@
-# 下载模型：先选平台，再选来源
+# 新手下载模型：从找到仓库到开始运行
 
-**按当前访客设备生成命令：** [选择系统、内存和模型，直接复制下载指令](/guide/deploy)。**搜索新模型：** [查询 Hugging Face 官方公开目录](/guide/model-search)。下方是手动操作知识，不需要照搬别人的硬件配置。
+**先选对模型，再下载。** 第一次不用看懂所有技术名词，只要按步骤找到可信来源、选对版本、复制与你电脑相符的下载命令，最后确认文件已下载成功。
 
-本页帮你解决三个问题：**下载哪个版本、从哪里下载、下载完成后怎么确认文件可以使用**。选择模型时先看 [容量计算器](/recommend/)，再看下方对应的运行工具。
+## 第一步 · 我想做什么？
 
-## 01 · 先选模型和运行工具
-
-| 你的电脑和目标 | 优先选的工具 | 模型来源 | 实际部署步骤 |
-| --- | --- | --- | --- |
-| Mac / Ubuntu / Windows，文字聊天 | **Ollama** | [Ollama 模型库](https://ollama.com/library) | [Mac](/mac/models/ollama) · [Ubuntu](/ubuntu/ollama) · [Windows](/windows/ollama) |
-| 三个平台，图片生成 | **ComfyUI** | 工作流官方模板及其列出的权重仓库 | [Mac](/comfyui/mac) · [Ubuntu](/comfyui/ubuntu) · [Windows](/comfyui/windows) |
-| Mac，LTX-2.5 视频 | **ltx-2-mlx** | [LTX-2.5 MLX Q4](https://huggingface.co/dgrauet/ltx-2.5-mlx-q4) | [LTX Mac 全流程](/mac/models/ltx25) |
-| Mac，Wan2.2 视频 | **mlx-video** | [Wan2.2 TI2V-5B MLX Q8](https://huggingface.co/Anes1032/Wan2.2-TI2V-5B-mlx-q8) | [Wan Mac 全流程](/mac/models/wan22) |
-| Ubuntu / Windows，NVIDIA 视频 | **ComfyUI / PyTorch CUDA** | 上游官方模型及工作流对应版本 | [Ubuntu ComfyUI](/comfyui/ubuntu) · [Windows ComfyUI](/comfyui/windows) |
-
-**不要只按模型名字下载。** 同一个模型可能分为 GGUF、MLX、PyTorch safetensors 等不同版本；运行工具不匹配，文件下完也可能无法加载。
-
-## 02 · 按网络环境选择下载渠道
-
-| 网络条件 | 推荐操作 | 适用范围 |
+| 目标 | 先去哪里找 | 新手常用的运行工具 |
 | --- | --- | --- |
-| 国外网络，可直接访问官网 | 使用 Hugging Face、Ollama、模型开发者的官方仓库 | 优先，来源最清晰 |
-| 国内网络，官方源可以正常访问 | 仍优先直接下载；慢时增加下载超时并重试 | 不需要额外设置 |
-| 国内网络，官方 Hugging Face 访问受限 | 可根据网络条件使用**科学上网**访问官方仓库；或评估 ModelScope、第三方 HF 镜像 | 先核对模型 ID、版本、文件清单、许可证 |
-| 有对应模型的 ModelScope 发布仓库 | 使用 ModelScope 官方下载工具 | 仅适用于 **ModelScope 上确实存在的那个模型** |
+| **文字聊天 / 编程** | [Ollama 模型库](https://ollama.com/library) | Ollama（Mac、Ubuntu、Windows） |
+| **生成图片** | [ComfyUI 新手教程](/comfyui/first-workflow) | ComfyUI 与模板对应权重 |
+| **生成视频** | [按设备选视频模型](/guide/deploy) | Mac MLX 或 NVIDIA CUDA，取决于设备 |
 
-::: warning 国内镜像的边界
-ModelScope 与 Hugging Face 是**不同模型仓库平台**。名字相近不代表文件、revision 或量化格式完全一致；不能把 ModelScope 上的 PyTorch 原版当成 MLX 转换版。
+如果已经知道模型名称，比如 Qwen3.8、LTX、Wan，请直接打开 [搜索官方模型仓库](/guide/model-search)。
 
-HF-Mirror 是**第三方社区镜像，不是 Hugging Face 官方服务**。仅在能够确认来源、文件完整性并接受服务风险时使用；受限模型和登录令牌优先走官方入口。不要把 token 发给陌生下载网站。
-:::
+## 第二步 · 看清仓库和版本
 
-## 03 · Ollama 模型：最简单的下载方式
+同一个名字通常会有多种发布格式。**找到模型不等于找到了适合你电脑的版本。**
 
-完成对应系统的 Ollama 安装后，打开终端（Windows 使用 PowerShell）：
+- **Ollama**：在模型库找到准确的 `模型名:标签`，例如 `qwen2.5:3b`。
+- **Mac MLX**：确认模型仓库明确支持 Apple Silicon + MLX，不能拿原始 PyTorch 文件直接替换。
+- **ComfyUI / NVIDIA**：先找到能运行的模板或工作流，再下载其明确要求的模型文件。
 
-~~~bash
+看不懂版本没关系：请先在 [按自己的电脑配置选模型](/guide/deploy) 中选择系统、内存或显存，查看本站已经核对过的候选。
+
+## 第三步 · 选下载渠道
+
+| 当前网络 | 建议怎么做 |
+| --- | --- |
+| 官方模型仓库能打开 | **优先直接从官方源下载** |
+| 国内网络访问官方源较慢或受限 | 根据网络条件使用**科学上网**访问原始仓库 |
+| 希望使用 ModelScope | 先确认它确实发布了**相同格式和版本**的权重 |
+| 想尝试第三方 Hugging Face 镜像 | 只用于公开且能核对的文件，不要把访问令牌交给第三方 |
+
+不要因为 ModelScope 上有同名模型，就假设它等于 Hugging Face 上的 MLX Q4 转换权重。
+
+## 第四步 · 复制下载命令
+
+**A. Ollama：最适合第一次本地聊天**
+
+先通过 [Mac](/mac/models/ollama)、[Ubuntu](/ubuntu/ollama) 或 [Windows](/windows/ollama) 教程装好 Ollama。下面是轻量示例，不代表最适合你设备的唯一版本：
+
+```bash
 ollama pull qwen2.5:3b
 ollama list
 ollama run qwen2.5:3b
-~~~
+```
 
-**这三行分别做什么？** 第一行下载模型；第二行确认下载列表；第三行真正运行模型。最后输入一句问题，收到回答才算成功。
+第一行下载，第二行检查列表，第三行实际提问。**收到模型回答，才算首次运行成功。**
 
-模型标签需要从 [官方 Ollama 模型库](https://ollama.com/library/qwen2.5) 核对。Ollama 使用自己的模型存储与下载机制，**不使用**下方的 `hf download` 指令来直接管理 Ollama 内置模型。
+**B. LTX / Wan：Mac 视频模型**
 
-## 04 · Hugging Face：Mac / Ubuntu 下载 MLX 等模型
+先到 [模型下载路线](/guide/deploy) 选择 Mac、统一内存、磁盘空间以及 LTX 或 Wan。页面会给出正确的 Hugging Face 仓库、独立下载环境与适用指令；不要直接粘贴别的电脑上的绝对路径。
 
-先在 Finder（Ubuntu 可用文件管理器）中新建专用模型目录。Mac 可参考 [选择项目文件夹](/mac/02-environment)。接下来所有命令在**该项目目录**执行。
+**C. 在搜索中找到其他 Hugging Face 模型**
 
-以 macOS 为例，先创建只用于下载的 Python 环境并安装 Hugging Face 官方下载工具：
+点击 [实时搜索](/guide/model-search)，找到具体仓库，再点「查看下载方法」选择系统。模型未审核前，下载指令只用于帮助你取得文件，**不代表已通过硬件兼容性验证**。
 
-~~~bash
+## 第五步 · 怎么判断下载完成？
+
+1. 终端或软件显示下载结束，**没有错误**。
+2. 模型文件夹能看到对应仓库 Files 列出的权重与必要组件，而不只是几个很小的说明文件。
+3. 使用正确的运行工具加载权重，完成第一次文字回答、图片或 MP4 生成。
+
+**只有真实运行并产生结果，才算部署成功。** 模型仓库的下载数字不等于显存峰值。
+
+[按自己的设备生成下载命令](/guide/deploy) · [回到部署路线](/guide/start)
+
+::: details 进阶：Hugging Face 下载工具如何安装？（Mac / Ubuntu）
+在自己新建的模型项目文件夹打开终端，再执行：
+
+```bash
+PROJECT_ROOT="$(pwd -P)"
+export HF_HOME="$PROJECT_ROOT/.cache/huggingface"
+export PIP_CACHE_DIR="$PROJECT_ROOT/.cache/pip"
 python3 -m venv .download-venv
-source .download-venv/bin/activate
-python -m pip install -U huggingface_hub
-export HF_HOME="$(pwd -P)/.cache/huggingface"
-hf --help
-~~~
+./.download-venv/bin/python -m pip install -U huggingface_hub
+./.download-venv/bin/hf --help
+```
 
-**成功标志：** `hf --help` 能显示命令说明。首次下载安装工具需要有可访问的软件包来源。若 Python 版本与包不兼容，先按官方版本要求调整 Python。
+然后在已经确认仓库的前提下：
 
-先下载一个很小的测试文件，确认下载渠道正常：
+```bash
+./.download-venv/bin/hf download dgrauet/ltx-2.5-mlx-q4 \
+  --local-dir "$PROJECT_ROOT/models/ltx25-q4"
+```
 
-~~~bash
-hf download openai-community/gpt2 config.json --local-dir ./models/download-test
-~~~
-
-**成功标志：** `models/download-test/config.json` 存在。这个文件仅供验证网络，**不是用来生成视频的模型**。
-
-下载真实 LTX / Wan 时使用对应模型页的**完整仓库 ID**和专门的 `--local-dir` 路径。对需要同意许可协议的模型，先到 Hugging Face 原仓库登录并获得访问权限，再在本机运行 `hf auth login`。访问受限时可能需要科学上网。
-
-::: details 下载时怎么固定版本？
-在 Hugging Face 的 Files / History 页面复制对应的 **Commit SHA**，下载时加 `--revision <实际的Commit SHA>`。这样下次重新部署不会意外得到更新后的文件版本。不要直接复制网页示例中的尖括号占位符。
+这个 LTX 模型下载量较大；请先在 [按设备选择模型](/guide/deploy) 确认内存与磁盘余量。
 :::
 
-## 05 · 国内下载：ModelScope 和 Hugging Face 镜像
+::: details 进阶：Windows PowerShell 下载 Hugging Face 模型
+先在资源管理器中建立专用项目目录，在该目录打开 PowerShell：
 
-### A. 在 ModelScope 下载“确实存在”的模型
-
-以 ModelScope 文档中提供的 Qwen3-0.6B 为例，在专用 Python 环境执行：
-
-~~~bash
-python -m pip install -U modelscope
-modelscope download --model Qwen/Qwen3-0.6B \
-  --local_dir ./models/Qwen3-0.6B
-~~~
-
-**成功标志：** 目标目录出现完整模型文件。这个例子用于熟悉 ModelScope 下载方式，不是 LTX 或 Wan 的替代权重。实际模型需先在 [ModelScope](https://modelscope.cn/models) 核对仓库 ID、格式和许可证。
-
-### B. HF 社区镜像（可选）
-
-如果官方 Hugging Face 访问不稳定，可以了解 [HF-Mirror](https://hf-mirror.com/) 的说明。Mac / Ubuntu 可在**单次命令**前临时指定：
-
-~~~bash
-HF_ENDPOINT=https://hf-mirror.com \
-  hf download openai-community/gpt2 config.json \
-  --local-dir ./models/mirror-test
-~~~
-
-**成功标志：** 下载得到正确配置文件。第三方镜像并不保证所有仓库、访问权限或大文件传输正常；大模型文件应再与上游仓库文件列表和可信校验信息比对。
-
-Windows PowerShell 的临时写法：
-
-~~~powershell
-$env:HF_ENDPOINT = 'https://hf-mirror.com'
-hf download openai-community/gpt2 config.json --local-dir .\models\mirror-test
-Remove-Item Env:HF_ENDPOINT
-~~~
-
-如果不使用镜像，确保已取消之前设置的 `HF_ENDPOINT`，再从官方源下载。**不要把镜像地址永久写进全局环境配置**，避免影响其他项目。
-
-## 06 · Windows 手动下载 Hugging Face 模型
-
-先用资源管理器新建模型项目目录，打开 PowerShell，通过 `cd` 进入该目录。若已安装兼容 Python：
-
-~~~powershell
+```powershell
+$PROJECT_ROOT = (Get-Location).Path
+$env:HF_HOME = Join-Path $PROJECT_ROOT '.cache\huggingface'
+$env:PIP_CACHE_DIR = Join-Path $PROJECT_ROOT '.cache\pip'
 py -3 -m venv .download-venv
 .\.download-venv\Scripts\python.exe -m pip install -U huggingface_hub
-$env:HF_HOME = (Join-Path (Get-Location).Path '.cache\huggingface')
-.\.download-venv\Scripts\hf.exe download openai-community/gpt2 config.json --local-dir .\models\download-test
-~~~
+.\.download-venv\Scripts\hf.exe --help
+```
 
-如果最后一行找不到 `hf.exe`，请先检查前面的安装日志和实际虚拟环境中生成的命令位置。下载正式模型时，将测试仓库 ID 换成**目标平台支持的实际仓库 ID**。
+下载前还应核对所选模型能否使用 Windows 的目标推理工具。
+:::
 
-## 07 · 下载后怎样检查？
+::: details 进阶：国内镜像、版本锁定和文件校验
+**ModelScope** 使用独立模型仓库和下载工具；只有发布了对应权重版本的仓库，才适合用它替代其他来源。
 
-1. **核对文件**：权重、配置、文本编码器、VAE、tokenizer 是否与所选仓库的文件清单一致。
-2. **检查文件大小**：只有几百字节的“权重文件”可能是错误页或 Git LFS 指针，不是真正权重。
-3. **校验 SHA-256**：仅在官方发布了可信校验值时，才能对照验证；本机单独计算的哈希不能证明文件来自官方。
-4. **运行最小任务**：模型能成功加载并产生回答、图片或视频，才算完成真实部署验证。
+**HF-Mirror** 属于第三方社区镜像。对可公开访问的仓库，在能核对下载文件的条件下，Mac/Linux 可临时指定 `HF_ENDPOINT=https://hf-mirror.com`；但不要将私人访问令牌发送给不可信服务，也不要把镜像配置写入全局环境。
 
-**下一步：** [Mac 模型下载与版本说明](/mac/04-models) · [ComfyUI 模型目录](/comfyui/models-and-paths) · [计算容量](/recommend/)。
+`hf download` 支持 `--revision`。想固定模型版本，可以在官方仓库 Files / History 复制真实 Commit SHA，再按官方帮助添加 `--revision`。本地独立计算 SHA-256 不能证明文件来自官方，只有与可信上游公布的哈希一致才可用作来源校验。
 
-参考：[Hugging Face 下载指南](https://huggingface.co/docs/huggingface_hub/guides/download) · [官方 CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) · [ModelScope CLI](https://github.com/modelscope/modelscope/blob/master/docs/source/command.md)。
+原始操作资料：[Hugging Face 官方下载文档](https://huggingface.co/docs/huggingface_hub/guides/download) · [官方 CLI](https://huggingface.co/docs/huggingface_hub/guides/cli) · [ModelScope](https://modelscope.cn/models)。
+:::

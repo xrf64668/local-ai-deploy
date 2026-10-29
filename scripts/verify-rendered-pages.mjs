@@ -8,7 +8,8 @@ const cases = [
   {route:'mac/recommend/',markers:['芯片系列','统一内存','模型权重','当前硬件的模型推荐结果']},
   {route:'guide/start',markers:['我的电脑','想运行什么','确认电脑配置']},
   {route:'guide/deploy',markers:['用你的硬件配置生成下载命令','你的系统','请选择容量']},
-  {route:'guide/model-search',markers:['官方模型搜索与核验','搜索官方模型']}
+  {route:'guide/model-download',markers:['新手下载模型','第一步','第四步']},
+  {route:'guide/model-search',markers:['第一次找模型','搜索官方模型']}
 ]
 
 for (const {route,markers} of cases) {

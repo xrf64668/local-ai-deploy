@@ -34,7 +34,7 @@ export default defineConfig({
           { text: '总览：从哪里开始', link: '/mac/' },
           { text: '部署路线与目录约定', link: '/mac/roadmap' },
           { text: 'Mac 容量计算器', link: '/mac/recommend/' },
-          { text: '国内外下载模型', link: '/guide/model-download' }
+          { text: '新手：找模型与下载', link: '/guide/model-download' }
         ] },
         { text: '01–07 部署实践', collapsed: false, items: [
           { text: '01 · 硬件与系统检查', link: '/mac/01-preflight' },
@@ -78,8 +78,8 @@ export default defineConfig({
       '/guide/': [
         { text: '基础知识', items: [
           { text: '部署路线选择', link: '/guide/start' },
-          { text: '如何下载模型（国内/国外）', link: '/guide/model-download' },
-          { text: '搜索官方模型仓库', link: '/guide/model-search' },
+          { text: '新手：怎么找模型、怎么下载', link: '/guide/model-download' },
+          { text: '搜索模型与生成下载命令', link: '/guide/model-search' },
           { text: '模型库自动发现与实测数据', link: '/contribute/model-lifecycle' },
           { text: '根据自己的设备生成下载指令', link: '/guide/deploy' },
           { text: '什么是本地 AI 部署', link: '/guide/what-is-local-ai' },

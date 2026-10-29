@@ -1,31 +1,26 @@
-# 开始部署：按目标选择实际安装路线
+# 从零开始：找到模型并在自己电脑上运行
 
-第一次运行本地 AI，不用把所有文档都读完。先选择**使用的电脑、想完成的任务和自己的经验**，再按顺序完成硬件检查、计算资源、安装工具、下载模型、真实运行与 API 接入。
+第一次部署本地 AI，按这个顺序操作就行：**选择自己电脑 → 找适合的模型 → 下载对应版本 → 跑出第一个结果**。不需要先了解 HTTP API、Git revision、模型量化等所有概念。
 
 <DeploymentPathPicker />
 
-已有具体硬件配置？打开 [访客专属的模型下载指令生成器](/guide/deploy)，不需要沿用网站作者的测试机器。需要找更新的模型可使用 [Hugging Face 官方实时搜索](/guide/model-search)。
+## 接下来只需要做四件事
 
-## 怎样才算部署成功？
+1. **认识自己的电脑**：确认是 Mac、Ubuntu 还是 Windows，以及内存、显存和磁盘剩余空间。
+2. **选择模型**：不知道名字就 [按电脑推荐模型](/recommend/)；知道名字就去 [搜索官方模型仓库](/guide/model-search)。
+3. **下载模型**：根据 [新手下载教程](/guide/model-download) 选官方源、国内可用渠道，复制与设备匹配的下载命令，也可以直接 [生成专属下载路线](/guide/deploy)。
+4. **第一次运行**：真正生成文字、图片或视频；出现错误时检查日志，而不是把“下载完成”当作成功。
 
-| 阶段 | 应该看到什么 |
-| --- | --- |
-| 环境检查 | 确认芯片或显卡、可用内存、磁盘空间 |
-| 模型下载 | 权重文件已准备好，格式与运行工具一致 |
-| 首次推理 | 产生真实文字回答、图片或视频 |
-| API 调用 | 发出请求并获得结果，能够识别失败状态 |
-
-## 也可以直接进入常见教程
-
-- **国内 / 国外模型下载：** [怎样选择仓库、镜像和对应的命令](/guide/model-download)
-
-- **Mac 本地聊天：** [安装 Ollama](/mac/models/ollama)
-- **Ubuntu 本地聊天：** [安装 Ollama](/ubuntu/ollama)
-- **Windows 本地聊天：** [安装 Ollama](/windows/ollama)
-- **图片工作流：** [ComfyUI 新手入门](/comfyui/)
-- **视频模型：** [LTX-2.5](/mac/models/ltx25) · [Wan2.2](/mac/models/wan22)
-- **不知道机器适合什么模型：** [硬件容量计算器](/recommend/)
-
-::: tip 看到不认识的词？
-可以随时查 [术语词典](/comfyui/glossary)；一般新手不需要先掌握所有命令，完成第一个结果后再逐步学习即可。
+::: tip 我是第一次使用，要不要学 API？
+**不需要。** 先完成首次生成。只有当你想让 Java、手机 App、网页或其他程序调用本地模型时，再学习 [HTTP API 接入](/mac/07-api) 或 [ComfyUI API](/comfyui/api)。
 :::
+
+## 快速进入对应教程
+
+| 我要实现 | 从这里开始 |
+| --- | --- |
+| Mac 本地聊天 | [Mac Ollama 入门](/mac/models/ollama) |
+| Windows / Ubuntu 本地聊天 | [Windows](/windows/ollama) · [Ubuntu](/ubuntu/ollama) |
+| 本地生成图片 | [ComfyUI 第一次生成](/comfyui/first-workflow) |
+| Mac 本地生成视频 | [LTX-2.5](/mac/models/ltx25) · [Wan2.2](/mac/models/wan22) |
+| 不知道硬件适合什么 | [容量推荐器](/recommend/) |

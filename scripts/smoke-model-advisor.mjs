@@ -247,23 +247,23 @@ try {
 
   assert.ok(await evaluate("document.querySelectorAll('.deployment-picker .stage a').length===0 && document.querySelectorAll('.deployment-picker a.go').length===1"),'新手主流程不能再是六个步骤六次跳转')
   await evaluate("(() => {const s=document.querySelectorAll('.deployment-picker .selectors select');s[0].value='ubuntu';s[0].dispatchEvent(new Event('change',{bubbles:true}));s[1].value='image';s[1].dispatchEvent(new Event('change',{bubbles:true}))})()")
-  assert.ok(await retry(() => evaluate("document.querySelector('.deployment-picker a.go')?.getAttribute('href').includes('/ubuntu/?task=image')"),'开始部署只应直接引导到指定系统和目标')
+  assert.ok(await retry(() => evaluate("document.querySelector('.deployment-picker a.go')?.getAttribute('href').includes('/ubuntu/?task=image')")),'开始部署只应直接引导到指定系统和目标')
   console.log('[PASS] 从零开始入口不再拆成六个可点击步骤')
 
   await navigate('/mac/?task=chat')
-  assert.ok(await retry(()=>evaluate("document.querySelector('.mac-path-advisor .advice-panel')===null && !!document.querySelector('.mac-path-advisor .goal-card[aria-pressed=true]')"),'跨页任务类型未预选'))
+  assert.ok(await retry(()=>evaluate("document.querySelector('.mac-path-advisor .advice-panel')===null && !!document.querySelector('.mac-path-advisor .goal-card[aria-pressed=true]')")),'跨页任务类型未预选')
   await evaluate("(() => {const s=document.querySelectorAll('.mac-path-advisor .hardware-grid select');for(const [i,v] of ['M4','64','120'].entries()){s[i].value=v;s[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
-  assert.ok(await retry(()=>evaluate("document.querySelector('.mac-path-advisor .mini-item a')?.getAttribute('href').includes('/mac/chat?')"),'Mac 语言模型不得再绕去通用下载页'))
+  assert.ok(await retry(()=>evaluate("document.querySelector('.mac-path-advisor .mini-item a')?.getAttribute('href').includes('/mac/chat?')")),'Mac 语言模型不得再绕去通用下载页')
   const selectedMac=await evaluate("document.querySelector('.mac-path-advisor .mini-item a')?.getAttribute('href')")
   assert.ok(selectedMac.includes('model='),'模型选择必须随路由保留')
   await navigate('/mac/chat?model=q38&chip=M4&memory=64&disk=120')
-  assert.ok(await retry(()=>evaluate("document.querySelector('#quick-ollama-model')?.value==='q38' && document.querySelector('.one-page-ollama')?.textContent.includes('ollama pull qwen3.8:27b')"),'进入教程后没有恢复选择的 Qwen3.8 和下载命令'))
+  assert.ok(await retry(()=>evaluate("document.querySelector('#quick-ollama-model')?.value==='q38' && document.querySelector('.one-page-ollama')?.textContent.includes('ollama pull qwen3.8:27b')")),'进入教程后没有恢复选择的 Qwen3.8 和下载命令')
   assert.ok(await evaluate("document.querySelector('.deployment-selection')?.textContent.includes('64 GB')"),'硬件参数必须跟随到完整教程')
   console.log('[PASS] Mac 推荐 → 同一篇 Ollama 教程，模型和硬件配置不丢失')
 
   for(const platform of ['ubuntu','windows']){
     await navigate('/'+platform+'/chat?model=q7&memory=32&vram=12&disk=80')
-    assert.ok(await retry(()=>evaluate("document.querySelector('#quick-ollama-model')?.value==='q7' && document.querySelector('.one-page-ollama')?.textContent.includes('ollama pull qwen2.5:7b')"), platform+' 具体模型标签未带入完整教程'))
+    assert.ok(await retry(()=>evaluate("document.querySelector('#quick-ollama-model')?.value==='q7' && document.querySelector('.one-page-ollama')?.textContent.includes('ollama pull qwen2.5:7b')")), platform+' 具体模型标签未带入完整教程')
     assert.ok(await evaluate("document.querySelector('.deployment-selection')?.textContent.includes('12 GB')"),platform+' 显存信息丢失')
   }
   console.log('[PASS] Linux 和 Windows 一次选择的参数可直接带到下载与验证步骤')

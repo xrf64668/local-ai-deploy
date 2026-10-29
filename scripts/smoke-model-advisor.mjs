@@ -107,7 +107,9 @@ try {
   console.log('[PASS] Mac → Ubuntu → 4GB 显存，推荐结果按选项重新计算')
   // 2026 跨厂商推荐：默认 Ubuntu 4GB 不应误推荐 Qwen3.8；随后切换 Mac 32GB。
   assert.ok(await retry(() => evaluate("document.querySelector('.multi-vendor-recommendations .unavailable-models')?.textContent.includes('Qwen3.8 27B')"),'4GB NVIDIA 显存应标记 Qwen3.8 为容量不足'))
-  await evaluate("(() => {const p=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select');p.value='mac';p.dispatchEvent(new Event('change',{bubbles:true}));const r=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存')).querySelector('select');r.value='32';r.dispatchEvent(new Event('change',{bubbles:true}))})()")
+  await evaluate("(() => {const p=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select');p.value='mac';p.dispatchEvent(new Event('change',{bubbles:true}))})()")
+  assert.ok(await retry(() => evaluate("!![...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存'))?.querySelector('select')"),'Mac 统一内存选择器未出现'))
+  await evaluate("(() => {const r=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存')).querySelector('select');r.value='32';r.dispatchEvent(new Event('change',{bubbles:true}))})()")
   assert.ok(await retry(() => evaluate("document.body.innerText.includes('不同厂商的本地模型推荐') && document.body.innerText.includes('Qwen3.8 27B')"),'Mac 32GB 跨厂商推荐及 Qwen3.8 未显示'))
   console.log('[PASS] 跨厂商列表包含 Qwen3.8-27B')
   await evaluate("(() => { const x=[...document.querySelectorAll('.multi-vendor-recommendations label')].find(x=>x.textContent.includes('模型厂商')).querySelector('select');x.value='Google';x.dispatchEvent(new Event('change',{bubbles:true})) })()")

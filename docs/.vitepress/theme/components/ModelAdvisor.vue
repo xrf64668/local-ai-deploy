@@ -1,7 +1,7 @@
 <script setup>
-import {computed,ref} from 'vue'
+import {computed,ref,watch} from 'vue'
 import {withBase} from 'vitepress'
-import {MODEL_PROFILES,QUANTIZATION,estimateLLM,assessBudget,round2} from '../../data/model-memory.mjs'
+import {MODEL_PROFILES,QUANTIZATION,estimateLLM,assessBudget,round2,recommendLLM} from '../../data/model-memory.mjs'
 import {videoRecommendations} from '../../data/model-video.mjs'
 
 const props=defineProps({
@@ -40,9 +40,16 @@ const results=computed(()=>profiles.value.map(model=>{
   }
 }))
 const selected=computed(()=>results.value.find(r=>r.model.id===selectedId.value))
-const candidates=computed(()=>results.value
-  .filter(r=>r.model.id!=='custom' && !r.error && r.budget.tier!=='exceeds')
-  .sort((a,b)=>b.model.paramsB-a.model.paramsB))
+const llmAdvice=computed(()=>recommendLLM(results.value))
+// 更换硬件/量化/上下文时同步“详细分析”的模型，避免保留上一档 7B 而让用户误解。
+watch([platform,memory,vram,reserve,gpuReserve,quant,context,concurrent],()=>{
+  const best=llmAdvice.value.best
+  if(best){
+    selectedId.value=best.model.id
+    actualFile.value=0
+  }
+})
+const numberOfModels=computed(()=>llmAdvice.value.priority.length+llmAdvice.value.possible.length+llmAdvice.value.cautious.length)
 const videoRows=computed(()=>videoRecommendations({platform:platform.value,memoryGb:Number(memory.value),vramGb:Number(vram.value),diskGb:Number(freeDisk.value)}))
 const videoCandidates=computed(()=>videoRows.value.filter(row=>row.eligible))
 const videoUnavailable=computed(()=>videoRows.value.filter(row=>!row.eligible))
@@ -130,7 +137,57 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
       </div>
       <p class="fine">{{ platform==='mac'?chip+' · 系统预留可修改，使用统一内存作为预算。':'以单张显卡、权重和 KV 全部放在显存的情形计算；不把系统内存当作可直接替代的显存。' }} 计算不预测速度，也不模拟 CPU 卸载。</p>
 
-      <h3>第一步 · 选择想运行的模型</h3>
+      <section class="llm-recommendations" aria-label="按内存实时筛选的语言模型">
+        <h3>当前硬件的模型推荐结果</h3>
+        <p class="fine">已根据当前 {{ platform==='mac'?'统一内存':'GPU 显存' }} 和系统预留，筛选 {{ MODEL_PROFILES.length }} 个模型规模中的 <strong>{{ numberOfModels }} 个容量候选</strong>。这里对比的是 Q4/Q8/FP16 权重、上下文和缓存占用，不是模型能力排行榜。</p>
+        <div v-if="llmAdvice.best" class="recommend-highlight">
+          <div><span class="highlight-overline">当前容量档位建议先关注</span><h4>{{ llmAdvice.best.model.name }}</h4></div>
+          <p>预计使用 <strong>{{ round2(llmAdvice.best.estimate.totalGiB) }} GiB</strong>，预算剩余 <strong>{{ round2(llmAdvice.best.budget.remainingGiB) }} GiB</strong>。这里选择的是<strong>不超过约 70% 预算的最大参数模型</strong>；若没有这样的模型，则依次考虑更接近上限的候选。</p>
+          <a :href="withBase(deployment)">查看对应系统 Ollama 部署步骤 →</a>
+        </div>
+        <p v-else class="notice">当前预算下没有合适的全 GPU 容量候选。请降低上下文、量化精度、并发数，或检查设备预留空间。</p>
+
+        <div v-if="llmAdvice.priority.length" class="rank-group" aria-label="优先推荐的模型">
+          <h4>优先推荐 · 估算占预算 70% 以内（{{ llmAdvice.priority.length }}）</h4>
+          <div class="recommendation-rows">
+            <div v-for="row in llmAdvice.priority" :key="row.model.id" class="recommendation-row">
+              <strong>{{ row.model.name }}</strong>
+              <span>估算 {{ round2(row.estimate.totalGiB) }} GiB · 剩余 {{ round2(row.budget.remainingGiB) }} GiB</span>
+              <a :href="withBase(deployment)">部署教程</a>
+            </div>
+          </div>
+        </div>
+        <div v-if="llmAdvice.possible.length" class="rank-group" aria-label="可以尝试的模型">
+          <h4>可以尝试 · 预算占用 70%–85%（{{ llmAdvice.possible.length }}）</h4>
+          <div class="recommendation-rows">
+            <div v-for="row in llmAdvice.possible" :key="row.model.id" class="recommendation-row">
+              <strong>{{ row.model.name }}</strong>
+              <span>估算 {{ round2(row.estimate.totalGiB) }} GiB · 剩余 {{ round2(row.budget.remainingGiB) }} GiB</span>
+              <a :href="withBase(deployment)">部署教程</a>
+            </div>
+          </div>
+        </div>
+        <div v-if="llmAdvice.cautious.length" class="rank-group caution-group" aria-label="接近内存上限的模型">
+          <h4>谨慎尝试 · 预算占用 85%–100%（{{ llmAdvice.cautious.length }}）</h4>
+          <div class="recommendation-rows">
+            <div v-for="row in llmAdvice.cautious" :key="row.model.id" class="recommendation-row">
+              <strong>{{ row.model.name }}</strong>
+              <span>估算 {{ round2(row.estimate.totalGiB) }} GiB · 剩余 {{ round2(row.budget.remainingGiB) }} GiB</span>
+              <a :href="withBase(deployment)">部署教程</a>
+            </div>
+          </div>
+        </div>
+        <details v-if="llmAdvice.insufficient.length" class="unavailable-models">
+          <summary>当前全 GPU 预算不足的模型（{{ llmAdvice.insufficient.length }}）</summary>
+          <div v-for="row in llmAdvice.insufficient" :key="row.model.id" class="unavailable-row">
+            <strong>{{ row.model.name }}</strong>
+            <p class="fine">估算 {{ round2(row.estimate.totalGiB) }} GiB，超过预算约 {{ round2(-row.budget.remainingGiB) }} GiB；可能需要其他量化或部分 CPU 卸载路线。</p>
+          </div>
+        </details>
+        <p class="fine">切换内存、显存、量化、上下文或并发，以上结果会立即更新。70% / 85% 是本站为了保留运行余量设置的分档线，<strong>不代表官方最低配置或模型效果评测</strong>。芯片系列选项暂不参与性能或速度计算。</p>
+      </section>
+
+      <h3>单个模型的详细内存计算</h3>
       <label class="model-label">模型与参数结构
         <select v-model="selectedId" @change="actualFile=0">
           <option v-for="p in profiles" :key="p.id" :value="p.id">{{ p.name }}</option>
@@ -168,25 +225,16 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
       </template>
       <p v-else class="error">请检查模型参数：{{ selected?.error || '计算参数无效' }}</p>
 
-      <h3>第三步 · 对比其他模型的容量</h3>
-      <div class="comparison">
-        <div v-for="r in results.filter(x=>x.model.id!=='custom')" :key="r.model.id" class="item">
-          <div class="item-head"><strong>{{ r.model.name }}</strong><span>{{ r.error ? '参数待检查' : label(r.budget.tier) }}</span></div>
-          <p v-if="!r.error" class="fine">权重 {{ round2(r.estimate.weightsGiB) }} + KV {{ round2(r.estimate.kvGiB) }} + 工作区 {{ round2(r.estimate.workspaceGiB) }} = <strong>{{ round2(r.estimate.totalGiB) }} GiB</strong></p>
+      <details class="all-models">
+        <summary>查看全部 {{ MODEL_PROFILES.length }} 个模型的权重、KV 缓存与工作区拆分</summary>
+        <div class="comparison">
+          <div v-for="row in llmAdvice.evaluated" :key="row.model.id" class="item">
+            <div class="item-head"><strong>{{ row.model.name }}</strong><span>{{ row.tier==='insufficient'?'预算不足':row.tier==='caution'?'谨慎尝试':row.tier==='possible'?'可以尝试':'优先推荐' }}</span></div>
+            <p class="fine">权重 {{ round2(row.estimate.weightsGiB) }} + KV {{ round2(row.estimate.kvGiB) }} + 工作区 {{ round2(row.estimate.workspaceGiB) }} = <strong>{{ round2(row.estimate.totalGiB) }} GiB</strong></p>
+          </div>
         </div>
-      </div>
-      <h3>第四步 · 根据这台电脑的配置挑选模型</h3>
-      <p class="fine">下列候选按参数规模从大到小排列，只保留当前配置下未超出估算预算的模型。它们属于<strong>容量初筛</strong>，并不是已实机验证的兼容性名单。</p>
-      <div v-if="candidates.length" class="comparison" aria-label="模型容量初筛推荐结果">
-        <div v-for="r in candidates" :key="r.model.id" class="item">
-          <div class="item-head"><strong>{{ r.model.name }}</strong><span>{{ label(r.budget.tier) }}</span></div>
-          <p class="fine">估算占用 {{ round2(r.estimate.totalGiB) }} GiB · 预算剩余 {{ round2(r.budget.remainingGiB) }} GiB</p>
-          <a :href="withBase(deployment)">前往本系统的 Ollama 安装教程 →</a>
-        </div>
-      </div>
-      <p v-else class="error">当前条件下没有可列出的全 GPU 容量候选。可以缩小模型、缩短上下文或重新评估设备预留，不代表其他卸载方案完全不可用。</p>
-      <p class="fine">其他模型的权重使用量化估算，不会套用你为当前模型填写的实际文件大小。显存预算不足意味着**不能按当前假设全部放入 GPU**，并不等于 CPU/显存混合运行绝对不可能。</p>
-      <p class="next"><a :href="withBase(deployment)">按照本机平台进入 Ollama 安装教程 →</a></p>
+      </details>
+      <p class="fine">详情中的真实权重文件大小只影响所选模型的单项分析；上方跨模型推荐继续使用统一的量化近似值，便于公平对比。</p>
     </template>
     <template v-else-if="task==='video'">
       <h3>根据当前配置推荐的视频模型（{{ videoCandidates.length }}）</h3>
@@ -237,4 +285,15 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
 <style scoped>
 .calculator{margin:1.2rem 0 2rem;line-height:1.7}.notice{padding:1rem 1.15rem;border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);border-radius:12px}.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.85rem;margin:1.25rem 0}.controls label,.model-label{display:flex;flex-direction:column;gap:.35rem;font-size:.9rem;font-weight:600}.controls select,.controls input,.model-label select,.model-label input{width:100%;max-width:100%;border:1px solid var(--vp-c-divider);border-radius:9px;color:var(--vp-c-text-1);background:var(--vp-c-bg);padding:.64rem;font:inherit}.secondary{border-top:1px solid var(--vp-c-divider);padding-top:1rem}.model-label{max-width:450px;margin:.8rem 0}.fine{font-size:.85rem;color:var(--vp-c-text-2);line-height:1.65}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:.7rem;margin:1rem 0}.metrics>div{padding:1rem;border:1px solid var(--vp-c-divider);border-radius:11px;display:flex;flex-direction:column;gap:.25rem}.metrics span{color:var(--vp-c-text-2);font-size:.83rem}.metrics strong{font-size:1.18rem}.metrics .emphasis{background:var(--vp-c-brand-soft);border-color:var(--vp-c-brand-2)}.verdict{font-weight:600;padding:.7rem 1rem;border-left:3px solid var(--vp-c-brand-1);background:var(--vp-c-bg-soft)}.verdict.exceeds{border-left-color:var(--vp-c-danger-1)}.comparison{display:grid;gap:.7rem;margin:1rem 0}.item{border:1px solid var(--vp-c-divider);border-radius:10px;padding:.8rem 1rem}.item-head{display:flex;justify-content:space-between;gap:.6rem;flex-wrap:wrap}.item-head span{font-size:.77rem;color:var(--vp-c-text-2)}.item p{margin:.25rem 0}.next{font-weight:600}.error{color:var(--vp-c-danger-1)}details{border:1px solid var(--vp-c-divider);border-radius:10px;padding:1rem;margin:.7rem 0}summary{cursor:pointer}
  .video-models{display:grid;gap:1rem;margin:1rem 0}.video-model-card{border:1px solid var(--vp-c-divider);border-radius:13px;padding:1.2rem;background:var(--vp-c-bg-soft)}.video-title{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.65rem}.video-title h4{margin:0;font-size:1.07rem}.video-state{font-size:.79rem;border:1px solid var(--vp-c-divider);border-radius:99px;padding:.2rem .6rem}.video-state.experimental{color:var(--vp-c-warning-1)}.video-backend{font-weight:600;margin:.55rem 0;color:var(--vp-c-text-2)}.video-specs{display:grid;gap:.5rem;margin:.9rem 0}.video-specs div{display:grid;grid-template-columns:minmax(95px,130px) 1fr;gap:.65rem}.video-specs dt{font-size:.87rem;color:var(--vp-c-text-2)}.video-specs dd{margin:0;font-size:.89rem}.video-links{display:flex;gap:1rem;flex-wrap:wrap;font-size:.88rem;font-weight:600}.unavailable-models{margin:1.2rem 0}.unavailable-row{padding:.5rem 0;border-bottom:1px solid var(--vp-c-divider)}.unavailable-row:last-child{border-bottom:0}
+
+.llm-recommendations{border-top:1px solid var(--vp-c-divider);margin-top:1.4rem;padding-top:1rem}
+.recommend-highlight{padding:1.2rem;border:1px solid var(--vp-c-brand-2);background:var(--vp-c-brand-soft);border-radius:13px;margin:1rem 0}
+.highlight-overline{color:var(--vp-c-text-2);font-size:.8rem}
+.recommend-highlight h4{font-size:1.24rem;margin:.25rem 0}.recommend-highlight p{margin:.7rem 0}
+.rank-group{margin:1.25rem 0}.rank-group h4{font-size:.96rem;margin:.6rem 0}.caution-group h4{color:var(--vp-c-warning-1)}
+.recommendation-rows{display:grid;gap:.5rem}
+.recommendation-row{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(125px,1fr) auto;align-items:center;gap:.6rem;padding:.75rem 1rem;border:1px solid var(--vp-c-divider);border-radius:10px}
+.recommendation-row span{font-size:.83rem;color:var(--vp-c-text-2)}.recommendation-row a{font-size:.85rem;white-space:nowrap}
+.all-models{margin:1.25rem 0}
+@media(max-width:720px){.recommendation-row{grid-template-columns:1fr}.recommendation-row a{justify-self:start}}
 </style>

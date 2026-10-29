@@ -3,10 +3,16 @@
  * 来源：Qwen2.5 官方模型卡 + config.json；KV Cache 为逐层 K/V 张量计算式。
  * 计算全 GPU 放置场景，不推断 CPU Offload、多 GPU、吞吐或推理速度。
  */
+// 采用同一家族的不同规模，便于真正比较 8/16/32/64/128 GB。
+// 参数结构来自各自官方 Instruct config.json，参数量取官方公开的近似规模。
 export const MODEL_PROFILES = Object.freeze([
+  {id:'qwen25-05b',name:'Qwen2.5 0.5B Instruct',paramsB:0.49,layers:24,heads:14,kvHeads:2,hidden:896,source:'https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct',guide:'/mac/models/ollama',maxContext:32768},
+  {id:'qwen25-15b',name:'Qwen2.5 1.5B Instruct',paramsB:1.54,layers:28,heads:12,kvHeads:2,hidden:1536,source:'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct',guide:'/mac/models/ollama',maxContext:32768},
   {id:'qwen25-3b',name:'Qwen2.5 3B Instruct',paramsB:3.09,layers:36,heads:16,kvHeads:2,hidden:2048,source:'https://huggingface.co/Qwen/Qwen2.5-3B-Instruct',guide:'/mac/models/ollama',maxContext:32768},
   {id:'qwen25-7b',name:'Qwen2.5 7B Instruct',paramsB:7.61,layers:28,heads:28,kvHeads:4,hidden:3584,source:'https://huggingface.co/Qwen/Qwen2.5-7B-Instruct',guide:'/mac/models/ollama',maxContext:32768},
-  {id:'qwen25-14b',name:'Qwen2.5 14B Instruct',paramsB:14.7,layers:48,heads:40,kvHeads:8,hidden:5120,source:'https://huggingface.co/Qwen/Qwen2.5-14B-Instruct-GGUF',guide:'/mac/models/ollama',maxContext:32768}
+  {id:'qwen25-14b',name:'Qwen2.5 14B Instruct',paramsB:14.7,layers:48,heads:40,kvHeads:8,hidden:5120,source:'https://huggingface.co/Qwen/Qwen2.5-14B-Instruct',guide:'/mac/models/ollama',maxContext:32768},
+  {id:'qwen25-32b',name:'Qwen2.5 32B Instruct',paramsB:32.5,layers:64,heads:40,kvHeads:8,hidden:5120,source:'https://huggingface.co/Qwen/Qwen2.5-32B-Instruct',guide:'/mac/models/ollama',maxContext:32768},
+  {id:'qwen25-72b',name:'Qwen2.5 72B Instruct',paramsB:72.7,layers:80,heads:64,kvHeads:8,hidden:8192,source:'https://huggingface.co/Qwen/Qwen2.5-72B-Instruct',guide:'/mac/models/ollama',maxContext:32768}
 ]);
 
 // 量化格式平均每参数字节数的启发式近似。具体 GGUF 文件会混合精度、元数据和对齐。
@@ -56,4 +62,22 @@ export function assessBudget({estimate,platform='mac',memoryGb=16,vramGb=8,syste
   // 留出 15% 的不确定性空间，避免将接近上限的估算展示为“轻松运行”
   const tier=remainingGiB<0?'exceeds':estimate.totalGiB>budgetGiB*0.85?'tight':'candidate';
   return {target,budgetGiB,remainingGiB,tier};
+}
+
+// 把容量估算转为可解释的动态推荐分级。任何等级都不是性能或实机兼容性承诺。
+export function recommendLLM(rows) {
+  if(!Array.isArray(rows)) throw new TypeError('缺少模型容量评估列表')
+  const evaluated=rows.filter(row=>row?.model?.id!=='custom' && !row.error && row.estimate && row.budget)
+    .map(row=>{
+      const budget=row.budget.budgetGiB;
+      const ratio=budget>0?row.estimate.totalGiB/budget:Infinity;
+      const tier=ratio>1?'insufficient':ratio>0.85?'caution':ratio>0.7?'possible':'recommended';
+      return {...row,ratio,tier};
+    }).sort((a,b)=>b.model.paramsB-a.model.paramsB);
+  const priority=evaluated.filter(row=>row.tier==='recommended');
+  const possible=evaluated.filter(row=>row.tier==='possible');
+  const cautious=evaluated.filter(row=>row.tier==='caution');
+  const insufficient=evaluated.filter(row=>row.tier==='insufficient');
+  const best=priority[0]||possible[0]||cautious[0]||null;
+  return {evaluated,priority,possible,cautious,insufficient,best};
 }

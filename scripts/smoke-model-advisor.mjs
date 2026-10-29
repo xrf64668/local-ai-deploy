@@ -103,6 +103,14 @@ try {
   })()`)
   assert.ok(await retry(() => evaluate("document.querySelector('.verdict')?.textContent.includes('超出当前全 GPU 预算')"), '4GB 显存应显示容量不足'))
   console.log('[PASS] Mac → Ubuntu → 4GB 显存，推荐结果按选项重新计算')
+  // 每个内存档位必须变化推荐型号，而不只是改变剩余数字。
+  await evaluate("(() => { const p=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select'); p.value='mac';p.dispatchEvent(new Event('change',{bubbles:true})); })()")
+  for (const [ram, expected] of [[8,'3B'],[16,'7B'],[32,'14B'],[64,'32B']]) {
+    await evaluate("(() => { const ram=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存')).querySelector('select'); ram.value=" + JSON.stringify(String(8)) + ";ram.dispatchEvent(new Event('change',{bubbles:true})); })()".replace('"8"',JSON.stringify(String(ram))))
+    assert.ok(await retry(() => evaluate("document.querySelector('.recommend-highlight h4')?.textContent.includes("+JSON.stringify(expected)+")"), 'Mac '+ram+'GB 应推荐 Qwen '+expected))
+    console.log('[PASS] Mac '+ram+'GB 容量分档自动推荐 Qwen '+expected)
+  }
+  assert.ok(await evaluate("document.querySelector('.rank-group')?.textContent.includes('优先推荐')"),'容量分档推荐缺失')
   // Video task must display actual LTX/Wan candidates, not a generic ComfyUI-only route.
   await evaluate(`(() => {
     const platform=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select')

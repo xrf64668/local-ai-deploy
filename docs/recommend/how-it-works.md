@@ -6,9 +6,13 @@
 
 | 模型 | 参数量 | 层数 | 注意力头数 / KV 头数 | 隐藏维度 |
 | --- | --- | --- | --- | --- |
+| [Qwen2.5 0.5B](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct/blob/main/config.json) | 0.49B | 24 | 14 / 2 | 896 |
+| [Qwen2.5 1.5B](https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct/blob/main/config.json) | 1.54B | 28 | 12 / 2 | 1536 |
 | [Qwen2.5 3B](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/main/config.json) | 3.09B | 36 | 16 / 2 | 2048 |
 | [Qwen2.5 7B](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct/blob/main/config.json) | 7.61B | 28 | 28 / 4 | 3584 |
 | [Qwen2.5 14B](https://huggingface.co/Qwen/Qwen2.5-14B-Instruct/blob/main/config.json) | 14.7B | 48 | 40 / 8 | 5120 |
+| [Qwen2.5 32B](https://huggingface.co/Qwen/Qwen2.5-32B-Instruct/blob/main/config.json) | 32.5B | 64 | 40 / 8 | 5120 |
+| [Qwen2.5 72B](https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/blob/main/config.json) | 72.7B | 80 | 64 / 8 | 8192 |
 
 这些数据来自官方模型卡和配置文件，本站将其作为固定版本的结构资料，并不声称模型列表是实时同步的。
 
@@ -36,7 +40,9 @@ KV 字节 = 2 × 层数 × KV头数 × 每头维度
 - **Apple Silicon：** 统一内存总量减去用户选择的系统预留。
 - **Ubuntu / Windows NVIDIA：** 单卡显存减去显卡桌面、驱动等预留。
 
-计算假设**整模型及 KV 均放入目标内存**；不模拟 GPU 层卸载、跨卡分布、KV 量化、滑动窗口、推理速度或吞吐。结果可能是“具有进一步验证空间”“接近预算上限”“超出全 GPU 预算”。
+计算假设**整模型及 KV 均放入目标内存**；不模拟 GPU 层卸载、跨卡分布、KV 量化、滑动窗口、推理速度或吞吐。页面按估算占可用预算的比例分档：**优先推荐（≤70%）**、**可以尝试（70%–85%）**、**谨慎尝试（85%–100%）**、**超出预算（>100%）**。这组分档仅用于预留资源余量，不是官方硬件要求或速度预测。
+
+注意：选择器使用常见的“GB”标称内存，估算时按 GiB 近似处理。GB 与 GiB 并不完全相同；实际可用空间应根据系统或 GPU 监控数据重新校对。
 
 ## 图片、视频与语音如何处理？
 

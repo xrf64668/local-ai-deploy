@@ -108,7 +108,11 @@ try {
   // 每个内存档位必须变化推荐型号，而不只是改变剩余数字。
   await evaluate("(() => { const p=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select'); p.value='mac';p.dispatchEvent(new Event('change',{bubbles:true})); })()")
   for (const [ram, expected] of [[8,'3B'],[16,'7B'],[32,'14B'],[64,'32B']]) {
-    await evaluate("(() => { const ram=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存')).querySelector('select'); ram.value=" + JSON.stringify(String(8)) + ";ram.dispatchEvent(new Event('change',{bubbles:true})); })()".replace('"8"',JSON.stringify(String(ram))))
+    const selectRam = "(() => { const el=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存')).querySelector('select'); el.value=" + JSON.stringify(String(ram)) + "; el.dispatchEvent(new Event('change',{bubbles:true})); return el.value; })()"
+    assert.equal(await evaluate(selectRam),String(ram),'浏览器下拉框没有切换至目标档位')
+    await sleep(250)
+    const state = await evaluate("JSON.stringify({ram:[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('统一内存'))?.querySelector('select')?.value,best:document.querySelector('.recommend-highlight h4')?.textContent,priority:document.querySelector('.rank-group')?.textContent?.slice(0,90)})")
+    console.log('[DEBUG] Mac '+ram+'GB: '+state)
     assert.ok(await retry(() => evaluate("document.querySelector('.recommend-highlight h4')?.textContent.includes("+JSON.stringify(expected)+")"), 'Mac '+ram+'GB 应推荐 Qwen '+expected))
     console.log('[PASS] Mac '+ram+'GB 容量分档自动推荐 Qwen '+expected)
   }

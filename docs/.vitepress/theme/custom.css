@@ -1,0 +1,44 @@
+/* local-ai-deploy: legible, lightweight VitePress theme (no runtime dependency) */
+:root {
+  --vp-c-brand-1: #345bd6;
+  --vp-c-brand-2: #5175e4;
+  --vp-c-brand-3: #6689f4;
+  --vp-c-brand-soft: rgba(52, 91, 214, .10);
+  --vp-font-family-base: Inter, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(108deg, #2955cb 4%, #577af1 65%, #875ac6);
+  --vp-nav-bg-color: color-mix(in srgb, var(--vp-c-bg) 89%, transparent);
+}
+.dark {
+  --vp-c-brand-1: #9eb8ff;
+  --vp-c-brand-2: #7e9cff;
+  --vp-c-brand-3: #6785e9;
+  --vp-c-brand-soft: rgba(112, 152, 250, .14);
+  --vp-home-hero-name-background: linear-gradient(108deg, #a9c4ff, #a8adff 65%, #d5a4fb);
+}
+.VPHomeHero .name { letter-spacing: -.035em; }
+.VPHomeHero .tagline { line-height: 1.75; max-width: 44rem; }
+.VPFeature { border-radius: 18px !important; transition: border-color .18s ease, transform .18s ease; }
+.VPFeature:hover { transform: translateY(-2px); border-color: var(--vp-c-brand-2) !important; }
+.VPButton { border-radius: 10px !important; }
+.vp-doc { line-height: 1.85; }
+.vp-doc p { line-height: 1.9; }
+.vp-doc h2 { margin-top: 2.2rem; }
+.vp-doc h3 { margin-top: 1.55rem; }
+.vp-doc table { display: block; max-width: 100%; overflow-x: auto; }
+.vp-doc div[class*='language-'] { border-radius: 12px; }
+.vp-doc .custom-block { border-radius: 12px; }
+.vp-doc blockquote { border-radius: 0 10px 10px 0; }
+.vp-doc a { text-underline-offset: 3px; }
+.vp-doc a:focus-visible,
+.VPNav a:focus-visible,
+.VPButton:focus-visible { outline: 2px solid var(--vp-c-brand-1); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .VPHomeHero .name { font-size: clamp(2rem, 10vw, 3rem); }
+  .VPHomeHero .tagline { font-size: .98rem; }
+  .vp-doc { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .VPFeature { transition: none; }
+  .VPFeature:hover { transform: none; }
+}

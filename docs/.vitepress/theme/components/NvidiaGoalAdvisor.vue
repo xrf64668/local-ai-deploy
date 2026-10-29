@@ -19,6 +19,10 @@ const label=computed(()=>props.platform==='ubuntu'?'Ubuntu / NVIDIA':'Windows / 
 const filled=computed(()=>systemRam.value>0&&vram.value>=0&&disk.value>0)
 const choice=computed(()=>categoryOptions.find(x=>x.id===purpose.value))
 const link=computed(()=>withBase('/'+props.platform+'/'+purpose.value))
+function modelLink(id){
+ const q=new URLSearchParams({platform:props.platform,memory:String(systemRam.value),vram:String(vram.value),disk:String(disk.value),model:id});
+ return withBase('/guide/deploy?'+q.toString());
+}
 const capacity=computed(()=>filled.value&&purpose.value==='chat'
  ?shortlistOllama({platform:props.platform,memoryGb:systemRam.value,vramGb:vram.value,systemReserveGb:4,gpuReserveGb:Math.max(1,Math.min(3,vram.value*.12))}):null)
 const chatModels=computed(()=>{
@@ -76,7 +80,7 @@ const caveat=computed(()=>{
     <div v-if="vram===0" class="fine">没有 NVIDIA GPU：这条 Ollama 的 CPU-only 方案仍可单独尝试，但速度和内存预算需自己验证；下面不显示 GPU 适配型号。</div>
     <div v-else-if="chatModels.length" class="candidate-list">
      <div v-for="r in chatModels" :key="r.model.id" class="candidate"><span><strong>{{r.model.name}}</strong><small>下载约 {{r.model.downloadGB}}GB · 估算预算 {{r.planningGiB}}GiB</small></span>
-      <a :href="withBase('/guide/deploy?'+new URLSearchParams({platform:props.platform,memory:String(systemRam),vram:String(vram),disk:String(disk),model:r.model.id}).toString())">下载路线 →</a>
+      <a :href="modelLink(r.model.id)">下载路线 →</a>
      </div>
     </div>
     <p v-else class="warning">已收录的量化模型中，没有满足当前显存及磁盘初筛条件的候选。CPU / 部分卸载方案可能存在，但本站尚未评估该路线。</p>

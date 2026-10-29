@@ -28,6 +28,8 @@ ComfyUI Desktop 可通过图形界面安装。只有需要控制 Python、缓存
 | [06 · 运行任务](/mac/06-inference) | 控制内存、分辨率和并发 | 输出可打开且过程可复现 |
 | [07 · 开放 API](/mac/07-api) | 通过 HTTP 调用模型 | 得到有效响应或任务结果 |
 
+**部署路线会以访问者实际选择的系统、内存及磁盘为准。** 请从 [交互式下载路线](/guide/deploy) 选择你的配置；截图中的某台 Mac 不构成其他人的硬件适配结论。
+
 **第一次尝试视频模型？** 先看 [LTX-2.5 Q4：从下载到生成](/mac/models/ltx25) 或 [Wan2.2 Q8：完整操作](/mac/models/wan22)。每篇都含独立环境、下载命令与输出验收。
 
 [跨系统模型下载指南](/guide/model-download) · [阶段关系](/mac/roadmap) · [常见错误](/mac/troubleshooting)

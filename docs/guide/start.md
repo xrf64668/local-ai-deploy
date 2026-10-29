@@ -4,6 +4,8 @@
 
 <DeploymentPathPicker />
 
+已有具体硬件配置？打开 [访客专属的模型下载指令生成器](/guide/deploy)，不需要沿用网站作者的测试机器。需要找更新的模型可使用 [Hugging Face 官方实时搜索](/guide/model-search)。
+
 ## 怎样才算部署成功？
 
 | 阶段 | 应该看到什么 |

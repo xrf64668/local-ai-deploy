@@ -78,6 +78,8 @@ export default defineConfig({
         { text: '基础知识', items: [
           { text: '部署路线选择', link: '/guide/start' },
           { text: '如何下载模型（国内/国外）', link: '/guide/model-download' },
+          { text: '搜索官方模型仓库', link: '/guide/model-search' },
+          { text: '根据自己的设备生成下载指令', link: '/guide/deploy' },
           { text: '什么是本地 AI 部署', link: '/guide/what-is-local-ai' },
           { text: '硬件、显存与统一内存', link: '/guide/hardware' },
           { text: '如何选择工具', link: '/guide/choose-tool' }
@@ -91,6 +93,8 @@ export default defineConfig({
       '/recommend/': [
         { text: '模型选型', items: [
           { text: '交互式容量计算', link: '/recommend/' },
+          { text: '按设备生成下载指令', link: '/guide/deploy' },
+          { text: '搜索官方模型', link: '/guide/model-search' },
           { text: 'Qwen3.8-27B 部署教程', link: '/guide/qwen38-27b' },
           { text: '公式与假设', link: '/recommend/how-it-works' },
           { text: 'Mac 七阶段实战', link: '/mac/' },

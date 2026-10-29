@@ -66,11 +66,13 @@ const taskRoutes=computed(()=>{
 })
 const label=t=>t==='candidate'?'具有进一步验证的容量空间':t==='tight'?'接近可用上限，建议谨慎尝试':'超出当前全 GPU 预算'
 const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platform.value==='ubuntu'?'/ubuntu/ollama':'/windows/ollama')
+// 把当前访客输入带到独立下载路线。仅使用站点白名单中的模型 ID。
+const plannerLink=id=>'/guide/deploy?'+new URLSearchParams({platform:platform.value,memory:String(memory.value),vram:String(vram.value),disk:String(freeDisk.value),model:id}).toString()
 </script>
 
 <template>
   <section class="calculator" aria-label="本地模型硬件容量计算器">
-    <p class="notice"><strong>这是实时计算，不是按固定内存门槛查表。</strong> 你修改硬件、任务和上下文后，模型候选会随之变化；传统架构详细计算可在下方展开。结果属于<strong>容量估算</strong>，不是自动读取硬件或已通过实际推理的证明。</p>
+    <p class="notice"><strong>默认选项只是填写示例，不代表网站识别了你的硬件。</strong> 当前访客应先选择自己的系统与配置。 你修改硬件、任务和上下文后，模型候选会随之变化；传统架构详细计算可在下方展开。结果属于<strong>容量估算</strong>，不是自动读取硬件或已通过实际推理的证明。</p>
     <div class="controls">
       <label v-if="!props.lockPlatform">运行平台
         <select v-model="platform">
@@ -173,7 +175,7 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
             <p class="fine">架构：{{ row.model.architecture }}。复杂架构的运行峰值需用真实任务验证。</p>
             <div class="catalog-links">
               <a :href="row.model.source" target="_blank" rel="noopener noreferrer">查看官方模型标签 ↗</a>
-              <a :href="withBase(row.model.id==='q38'?'/guide/qwen38-27b':deployment)">查看下载部署步骤 →</a>
+              <a :href="withBase(plannerLink(row.model.id))">按这台设备生成下载命令 →</a>
             </div>
           </article>
         </div>
@@ -310,7 +312,7 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
           </dl>
           <p class="fine">{{ row.model.grade }}。实际兼容性还需按具体版本、分辨率和帧数实测。</p>
           <div class="video-links">
-            <a :href="withBase(row.model.guide)">查看部署教程 →</a>
+            <a :href="withBase(plannerLink(row.model.id))">按当前硬件查看下载命令 →</a>
             <a :href="row.model.modelUrl" target="_blank" rel="noopener noreferrer">模型来源 ↗</a>
             <a :href="row.model.evidenceUrl" target="_blank" rel="noopener noreferrer">查看依据 ↗</a>
           </div>

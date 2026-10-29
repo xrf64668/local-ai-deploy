@@ -3,6 +3,7 @@ import {computed,ref,watch} from 'vue'
 import {withBase} from 'vitepress'
 import {MODEL_PROFILES,QUANTIZATION,estimateLLM,assessBudget,round2,recommendLLM} from '../../data/model-memory.mjs'
 import {videoRecommendations} from '../../data/model-video.mjs'
+import {OLLAMA_MODELS,shortlistOllama} from '../../data/ollama-catalog.mjs'
 
 const props=defineProps({
   initialPlatform:{type:String,default:'mac'},
@@ -22,6 +23,10 @@ const concurrent=ref(1)
 const selectedId=ref('qwen25-7b')
 const actualFile=ref(0)
 const custom=ref({paramsB:8,layers:32,hidden:4096,heads:32,kvHeads:8})
+const selectedVendor=ref('all')
+const selectedPurpose=ref('all')
+const vendorOptions=['all',...new Set(OLLAMA_MODELS.map(m=>m.vendor))]
+const modernAdvice=computed(()=>shortlistOllama({platform:platform.value,memoryGb:Number(memory.value),vramGb:Number(vram.value),systemReserveGb:Number(reserve.value),gpuReserveGb:Number(gpuReserve.value),context:context.value,concurrent:concurrent.value,vendor:selectedVendor.value,purpose:selectedPurpose.value}))
 const profiles=computed(()=>[...MODEL_PROFILES,{id:'custom',name:'自定义 Transformer 模型',...custom.value,maxContext:131072,source:'https://huggingface.co/docs/transformers/main_classes/configuration'}])
 const active=computed(()=>profiles.value.find(m=>m.id===selectedId.value)||profiles.value[0])
 const results=computed(()=>profiles.value.map(model=>{
@@ -65,7 +70,7 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
 
 <template>
   <section class="calculator" aria-label="本地模型硬件容量计算器">
-    <p class="notice"><strong>这是实时计算，不是按固定内存门槛查表。</strong> 你修改参数后，系统会重新计算权重、KV 缓存、推理预留及可用预算。结果是<strong>容量估算</strong>，不是自动读取硬件或已通过实际推理的证明。</p>
+    <p class="notice"><strong>这是实时计算，不是按固定内存门槛查表。</strong> 你修改硬件、任务和上下文后，模型候选会随之变化；传统架构详细计算可在下方展开。结果属于<strong>容量估算</strong>，不是自动读取硬件或已通过实际推理的证明。</p>
     <div class="controls">
       <label v-if="!props.lockPlatform">运行平台
         <select v-model="platform">
@@ -135,8 +140,58 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
           </select>
         </label>
       </div>
-      <p class="fine">{{ platform==='mac'?chip+' · 系统预留可修改，使用统一内存作为预算。':'以单张显卡、权重和 KV 全部放在显存的情形计算；不把系统内存当作可直接替代的显存。' }} 计算不预测速度，也不模拟 CPU 卸载。</p>
+      <p class="fine">{{ platform==='mac'?chip+' · 使用统一内存作为容量预算。':'使用单张 NVIDIA 显卡的显存预算。' }} 上下文和并发影响容量初筛；量化下拉框仅作用于下方可展开的传统 Transformer 详细计算，不会改变上方 Ollama 模型标签本身的量化精度。</p>
 
+      <section class="multi-vendor-recommendations" aria-label="跨厂商模型推荐结果">
+        <h3>不同厂商的本地模型推荐</h3>
+        <p class="fine">已收录 {{ OLLAMA_MODELS.length }} 个可在 Ollama 模型库核对的具体标签，包含 Qwen3.8、Gemma、DeepSeek、gpt-oss、Llama 和 Mistral。先按任务选模型，再看你的内存是否适合进一步尝试。</p>
+        <div class="controls">
+          <label>模型厂商
+            <select v-model="selectedVendor">
+              <option v-for="v in vendorOptions" :key="v" :value="v">{{ v==='all'?'全部厂商':v }}</option>
+            </select>
+          </label>
+          <label>主要用途
+            <select v-model="selectedPurpose">
+              <option value="all">不限用途</option>
+              <option value="general">聊天与通用任务</option>
+              <option value="code">编程与 Agent</option>
+              <option value="reasoning">复杂推理</option>
+              <option value="vision">图片理解</option>
+            </select>
+          </label>
+        </div>
+        <p class="fine">当前可用预算约 <strong>{{ modernAdvice.budgetGiB }} GiB</strong>；有进一步尝试空间的模型 <strong>{{ modernAdvice.eligible.length }} 个</strong>。以下使用 <strong>Ollama 官方标签的下载文件大小</strong>，再加工作区及随上下文增加的保护性余量。<strong>这是跨架构容量初筛，不是精确显存/KV 计算，也不是模型质量排名。</strong></p>
+        <div class="catalog-cards" v-if="modernAdvice.eligible.length">
+          <article v-for="row in modernAdvice.eligible" :key="row.model.id" class="catalog-card">
+            <div class="catalog-card-heading">
+              <strong>{{ row.model.name }}</strong>
+              <span>{{ row.model.vendor }} · {{ row.tier==='roomy'?'预算余量较多':row.tier==='possible'?'可以尝试':'接近预算上限' }}</span>
+            </div>
+            <p class="catalog-model-tag"><code>ollama run {{ row.model.tag }}</code></p>
+            <p class="fine">官方标签下载约 {{ row.model.downloadGB }} GB · 规划占用约 {{ row.planningGiB }} GiB · 预算剩余 {{ row.remainingGiB }} GiB</p>
+            <p class="fine">架构：{{ row.model.architecture }}。复杂架构的运行峰值需用真实任务验证。</p>
+            <div class="catalog-links">
+              <a :href="row.model.source" target="_blank" rel="noopener noreferrer">查看官方模型标签 ↗</a>
+              <a :href="withBase(row.model.id==='q38'?'/guide/qwen38-27b':deployment)">查看下载部署步骤 →</a>
+            </div>
+          </article>
+        </div>
+        <p v-else class="fine">当前筛选条件下，没有足够预算的候选。可以降低模型文件规模，或者查看下面的容量不足列表。</p>
+        <details v-if="modernAdvice.over.length" class="unavailable-models">
+          <summary>查看当前规划预算不足的模型（{{ modernAdvice.over.length }}）</summary>
+          <div v-for="row in modernAdvice.over" :key="row.model.id" class="unavailable-row">
+            <strong>{{ row.model.name }}</strong>
+            <p class="fine">下载约 {{ row.model.downloadGB }} GB · 规划占用 {{ row.planningGiB }} GiB，超过预算约 {{ round2(-row.remainingGiB) }} GiB。</p>
+            <a :href="row.model.source" target="_blank" rel="noopener noreferrer">模型来源 ↗</a>
+          </div>
+        </details>
+        <p class="fine">特别提醒：Qwen3.8 等混合架构、gpt-oss 的 MoE 以及 Gemma 4 的滑动窗口，不能直接套用传统 Transformer 的全部 KV 计算。此处保护性余量为规划假设，不保证上下文实际可用；下载体积与 GPU 实际驻留量也不等价。</p>
+      </section>
+
+      <details class="legacy-estimator">
+        <summary>进阶：展开 Qwen2.5 传统 Transformer 的精细计算与自定义模型</summary>
+        <p class="fine">下面是用于理解权重、传统 FP16 KV 缓存、层数与头数关系的计算器，只包含已录入结构的 Qwen2.5 及自定义标准 Transformer。上面的跨厂商推荐使用各模型的实际 Ollama 标签与独立的容量初筛，不应把两者的数字当成同一精度。</p>
       <section class="llm-recommendations" aria-label="按内存实时筛选的语言模型">
         <h3>当前硬件的模型推荐结果</h3>
         <p class="fine">已根据当前 {{ platform==='mac'?'统一内存':'GPU 显存' }} 和系统预留，筛选 {{ MODEL_PROFILES.length }} 个模型规模中的 <strong>{{ numberOfModels }} 个容量候选</strong>。这里对比的是 Q4/Q8/FP16 权重、上下文和缓存占用，不是模型能力排行榜。</p>
@@ -187,7 +242,7 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
         <p class="fine">切换内存、显存、量化、上下文或并发，以上结果会立即更新。70% / 85% 是本站为了保留运行余量设置的分档线，<strong>不代表官方最低配置或模型效果评测</strong>。芯片系列选项暂不参与性能或速度计算。</p>
       </section>
 
-      <h3>单个模型的详细内存计算</h3>
+      <h3>单个经典模型的详细内存计算</h3>
       <label class="model-label">模型与参数结构
         <select v-model="selectedId" @change="actualFile=0">
           <option v-for="p in profiles" :key="p.id" :value="p.id">{{ p.name }}</option>
@@ -235,6 +290,7 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
         </div>
       </details>
       <p class="fine">详情中的真实权重文件大小只影响所选模型的单项分析；上方跨模型推荐继续使用统一的量化近似值，便于公平对比。</p>
+      </details>
     </template>
     <template v-else-if="task==='video'">
       <h3>根据当前配置推荐的视频模型（{{ videoCandidates.length }}）</h3>
@@ -296,4 +352,15 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
 .recommendation-row span{font-size:.83rem;color:var(--vp-c-text-2)}.recommendation-row a{font-size:.85rem;white-space:nowrap}
 .all-models{margin:1.25rem 0}
 @media(max-width:720px){.recommendation-row{grid-template-columns:1fr}.recommendation-row a{justify-self:start}}
+
+.multi-vendor-recommendations{border-top:1px solid var(--vp-c-divider);padding-top:1.05rem}
+.catalog-cards{display:grid;gap:.7rem;margin:1rem 0}
+.catalog-card{border:1px solid var(--vp-c-divider);border-radius:12px;padding:1rem;background:var(--vp-c-bg-soft)}
+.catalog-card-heading{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.4rem}
+.catalog-card-heading strong{font-size:1.05rem}
+.catalog-card-heading span{font-size:.8rem;color:var(--vp-c-text-2)}
+.catalog-card p{margin:.4rem 0}.catalog-model-tag code{font-size:.9rem}
+.catalog-links{display:flex;gap:1rem;flex-wrap:wrap;font-size:.87rem;font-weight:600;margin-top:.5rem}
+.legacy-estimator{margin:1.6rem 0;border:1px solid var(--vp-c-divider);padding:1rem;border-radius:12px}
+.legacy-estimator>summary{cursor:pointer;font-weight:600}
 </style>

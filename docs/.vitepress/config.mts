@@ -91,6 +91,7 @@ export default defineConfig({
       '/recommend/': [
         { text: '模型选型', items: [
           { text: '交互式容量计算', link: '/recommend/' },
+          { text: 'Qwen3.8-27B 部署教程', link: '/guide/qwen38-27b' },
           { text: '公式与假设', link: '/recommend/how-it-works' },
           { text: 'Mac 七阶段实战', link: '/mac/' },
           { text: 'ComfyUI 入口', link: '/comfyui/' }

@@ -1,6 +1,6 @@
 # Mac · Apple Silicon 模型容量计算
 
-选择统一内存、量化、上下文与并发，系统会计算所选语言模型的**权重、KV 缓存和推理工作区**，并与系统预留后的内存预算比较。
+选择统一内存、量化、上下文与并发，系统会先展示 **Qwen3.8、Gemma、DeepSeek、gpt-oss、Llama、Mistral** 等模型的容量初筛；需要核对传统 Transformer 的权重与 KV 缓存时，再展开经典架构的详细计算。
 
 <MacModelAdvisor />
 

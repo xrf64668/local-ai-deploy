@@ -105,6 +105,13 @@ try {
   console.log('[DEBUG] 4GB 显存渲染状态：'+lowVramDebug)
   assert.ok(await retry(() => evaluate("!!document.querySelector('.recommend-highlight h4') && document.querySelector('.unavailable-models')?.textContent.includes('7B')"), '4GB 显存应出现分档推荐且将 7B 标为容量不足'))
   console.log('[PASS] Mac → Ubuntu → 4GB 显存，推荐结果按选项重新计算')
+  // 2026 多厂商推荐：32GB 显示真实的 Qwen3.8-27B，切换厂商后候选需要改变。
+  assert.ok(await retry(() => evaluate("document.body.innerText.includes('不同厂商的本地模型推荐') && document.body.innerText.includes('Qwen3.8 27B')"),'跨厂商推荐及 Qwen3.8 未显示'))
+  console.log('[PASS] 跨厂商列表包含 Qwen3.8-27B')
+  await evaluate("(() => { const x=[...document.querySelectorAll('.multi-vendor-recommendations label')].find(x=>x.textContent.includes('模型厂商')).querySelector('select');x.value='Google';x.dispatchEvent(new Event('change',{bubbles:true})) })()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.catalog-cards')?.textContent.includes('Gemma 4') && !document.querySelector('.catalog-cards')?.textContent.includes('Qwen3.8')"),'跨厂商选择后列表未变化'))
+  console.log('[PASS] 选择 Google 后只显示 Gemma 模型')
+  await evaluate("(() => { const x=[...document.querySelectorAll('.multi-vendor-recommendations label')].find(x=>x.textContent.includes('模型厂商')).querySelector('select');x.value='all';x.dispatchEvent(new Event('change',{bubbles:true})) })()")
   // 每个内存档位必须变化推荐型号，而不只是改变剩余数字。
   await evaluate("(() => { const p=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select'); p.value='mac';p.dispatchEvent(new Event('change',{bubbles:true})); })()")
   for (const [ram, expected] of [[8,'3B'],[16,'7B'],[32,'14B'],[64,'32B']]) {

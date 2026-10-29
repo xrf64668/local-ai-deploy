@@ -2,6 +2,14 @@
 
 [容量计算器](/recommend/) 使用模型结构和用户填写的硬件配置**重新计算容量**，不再通过固定的“8GB/16GB/32GB 门槛”判断。
 
+## 两种模型评估不能混为一谈
+
+**跨厂商容量初筛**：读取每个已核对 Ollama 模型标签公开的下载文件体积，换算为 GiB，再加入 max(1.5GiB，权重大小 20%) 的工作区规划余量及每 4096 tokens/会话 0.5GiB 的上下文占位余量。**后者不是 KV 缓存实测或精确计算**；对 Qwen3.8 混合注意力、Gemma 滑动窗口、gpt-oss MoE、多模态视觉输入，都必须重新实测峰值。这份目录的默认标签量化与下方传统计算器的 Q4/Q8/FP16 选项相互独立。不同厂商之间按内存占用筛选，**不按照文件大小判断模型能力好坏**。
+
+数据来自 Ollama 公布的 [Qwen3.8](https://ollama.com/library/qwen3.8)、[Qwen3.5](https://ollama.com/library/qwen3.5)、[Gemma4](https://ollama.com/library/gemma4)、[DeepSeek-R1](https://ollama.com/library/deepseek-r1)、[gpt-oss](https://ollama.com/library/gpt-oss)、[Llama3.1](https://ollama.com/library/llama3.1) 与 [Mistral Small3.1](https://ollama.com/library/mistral-small3.1)。公开标签会更新，部署时应核对下载大小、版本和许可证。
+
+**经典 Transformer 结构计算**：只用于下面录入的 Qwen2.5 模型，通过层数与注意力头数估算 FP16 KV 缓存。这部分不是所有模型都适用。
+
 ## 数据从哪里来？
 
 | 模型 | 参数量 | 层数 | 注意力头数 / KV 头数 | 隐藏维度 |
@@ -17,6 +25,8 @@
 这些数据来自官方模型卡和配置文件，本站将其作为固定版本的结构资料，并不声称模型列表是实时同步的。
 
 ## 计算哪些部分？
+
+以下公式**仅针对经典 Transformer 详细计算**：
 
 **估算总量 = 权重 + KV 缓存 + 推理工作区预留**。
 
@@ -57,3 +67,5 @@ KV 字节 = 2 × 层数 × KV头数 × 每头维度
 可检查的实现：[计算代码](https://github.com/xrf64668/local-ai-deploy/blob/main/docs/.vitepress/data/model-memory.mjs) · [公式测试](https://github.com/xrf64668/local-ai-deploy/blob/main/tests/model-memory.test.mjs)。
 
 视频候选数据文件：[model-video.mjs](https://github.com/xrf64668/local-ai-deploy/blob/main/docs/.vitepress/data/model-video.mjs) · [视频推荐规则测试](https://github.com/xrf64668/local-ai-deploy/blob/main/tests/model-video.test.mjs)。
+
+跨厂商初筛的源码和测试：[ollama-catalog.mjs](https://github.com/xrf64668/local-ai-deploy/blob/main/docs/.vitepress/data/ollama-catalog.mjs) · [对应测试](https://github.com/xrf64668/local-ai-deploy/blob/main/tests/ollama-catalog.test.mjs)。

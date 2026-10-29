@@ -19,8 +19,9 @@
 
 | 我要实现 | 从这里开始 |
 | --- | --- |
-| Mac 本地聊天 | [Mac Ollama 入门](/mac/models/ollama) |
+| Mac 本地聊天 | [Mac 语言模型专属路线](/mac/chat) |
 | Windows / Ubuntu 本地聊天 | [Windows](/windows/ollama) · [Ubuntu](/ubuntu/ollama) |
-| 本地生成图片 | [ComfyUI 第一次生成](/comfyui/first-workflow) |
-| Mac 本地生成视频 | [LTX-2.5](/mac/models/ltx25) · [Wan2.2](/mac/models/wan22) |
+| 本地生成图片 | [Mac 图像模型专属路线](/mac/image) |
+| Mac 本地生成视频 | [Mac 视频模型选型](/mac/video) |
+| Mac 语音识别 | [Mac Whisper 专属路线](/mac/audio) |
 | 不知道硬件适合什么 | [容量推荐器](/recommend/) |

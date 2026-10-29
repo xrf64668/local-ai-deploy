@@ -2,6 +2,7 @@ import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
 import ModelAdvisor from './components/ModelAdvisor.vue'
 import MacModelAdvisor from './components/MacModelAdvisor.vue'
+import MacGoalAdvisor from './components/MacGoalAdvisor.vue'
 import DeploymentPathPicker from './components/DeploymentPathPicker.vue'
 import ModelDownloadPlanner from './components/ModelDownloadPlanner.vue'
 import HubModelSearch from './components/HubModelSearch.vue'
@@ -12,6 +13,7 @@ export default {
   enhanceApp({ app }) {
     app.component('ModelAdvisor', ModelAdvisor)
     app.component('MacModelAdvisor', MacModelAdvisor)
+    app.component('MacGoalAdvisor', MacGoalAdvisor)
     app.component('DeploymentPathPicker', DeploymentPathPicker)
     app.component('ModelDownloadPlanner', ModelDownloadPlanner)
     app.component('HubModelSearch', HubModelSearch)

@@ -185,6 +185,33 @@ try {
   assert.ok(await retry(() => evaluate("document.querySelector('.hub-search .download-help pre')?.textContent.includes('hf download dgrauet/ltx-2.5-mlx-q4')"),'用户确认仓库后应显示 Mac 真实下载示例'))
   console.log('[PASS] 模型搜索 → 查看仓库 → 用户确认 → 生成下载命令')
 
+
+  // Mac portal: real device-first interaction, and each task must have an isolated route.
+  await navigate('/mac/')
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.mac-path-advisor .goal-grid') && document.querySelectorAll('.mac-path-advisor .goal-card').length===4"),'Mac 新入口四种模型类型渲染失败'))
+  assert.ok(await evaluate("!!document.querySelector('.mac-path-advisor .empty-state') && !document.querySelector('.mac-path-advisor .advice-panel')"),'未填写硬件时不能冒充已识别配置')
+  await evaluate("(() => { const s=document.querySelectorAll('.mac-path-advisor .hardware-grid select');for(const [i,v] of ['M4','16','30'].entries()){s[i].value=v;s[i].dispatchEvent(new Event('change',{bubbles:true}))} })()")
+  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(3)').click()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('LTX-2.3') && document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('统一内存')"),'Mac 16GB 视频路线未根据配置更新'))
+  assert.ok(await evaluate("document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('暂不推荐下载')"),'16GB 应明确标记大型视频模型不适用')
+  const beginnerVideo=await evaluate("JSON.stringify([...document.querySelectorAll('.mac-path-advisor .mini-item')].map(x=>({name:x.querySelector('strong')?.innerText,href:x.querySelector('a')?.getAttribute('href')||null})))")
+  assert.ok(beginnerVideo.includes('ltx23'),'16GB 必须提供 LTX2.3 的独立下载路线')
+  console.log('[PASS] Mac 16GB/30GB 视频只推荐适合进一步尝试的 LTX-2.3 专项教程')
+  await evaluate("(() => {const s=document.querySelectorAll('.mac-path-advisor .hardware-grid select');s[1].value='64';s[1].dispatchEvent(new Event('change',{bubbles:true}));s[2].value='120';s[2].dispatchEvent(new Event('change',{bubbles:true}))})()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('LTX-2.5') && document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('Wan2.2')"),'Mac 64GB 120GB 应展示 LTX/Wan 两条独立路线'))
+  console.log('[PASS] Mac 64GB/120GB 视频重新计算并出现 LTX 和 Wan 不同路线')
+  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(1)').click()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('Ollama') || document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('Qwen')"),'切换语言模型后必须显示语言类候选'))
+  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(2)').click()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('ComfyUI Desktop')"),'图像路线必须独立于视频'))
+  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(4)').click()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('whisper.cpp')"),'语音路线必须独立'))
+  console.log('[PASS] 语言/图像/视频/语音四种目标互相独立切换')
+  for(const route of ['/mac/chat','/mac/image','/mac/video','/mac/audio','/mac/models/ltx23']){
+    await navigate(route)
+    assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),'专属文档 '+route))
+  }
+  console.log('[PASS] 五篇 Mac 独立教程可直接访问')
   await navigate('/guide/start')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.deployment-picker .selectors')"),'部署路线选择器'))
   console.log('[PASS] 部署路线向导显示')

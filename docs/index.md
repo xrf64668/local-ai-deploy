@@ -19,7 +19,7 @@ hero:
 features:
   - icon: "🍎"
     title: Mac · Apple Silicon
-    details: 完整 01–07 过程，从芯片检查、MLX/Ollama 运行时到模型验证与 API。
+    details: 先填芯片、统一内存和磁盘，再分别进入聊天、图像、视频或语音的独立部署教程。
     link: /mac/
     linkText: 开始 Mac 部署
   - icon: "🧩"
@@ -56,7 +56,7 @@ features:
 | 你现在的情况 | 推荐起点 | 通过标准 |
 | --- | --- | --- |
 | 完全不懂模型和显存 | [选择部署路线](/guide/start) | 知道模型、后端与硬件的关系 |
-| 只有一台 Apple Silicon Mac | [Mac 七阶段](/mac/) | 完成环境检查与一次真实推理 |
+| 只有一台 Apple Silicon Mac | [按 Mac 配置选择模型类型](/mac/) | 找到自己的独立部署教程并完成真实生成 |
 | 想先用节点生成图片 | [ComfyUI 新手入口](/comfyui/) | 运行工作流并生成可打开的文件 |
 | 希望从 Java / Web 调用 | [API 服务化](/mac/07-api) | 本机请求得到真实模型返回 |
 | 不知道我的配置适合什么 | [硬件容量计算](/recommend/) | 查看权重、KV 缓存、工作区及预算结果 |

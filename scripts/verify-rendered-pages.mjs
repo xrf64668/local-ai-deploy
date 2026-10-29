@@ -6,6 +6,12 @@ const root = 'docs/.vitepress/dist'
 const cases = [
   {route:'recommend/',markers:['运行平台','统一内存','模型权重','当前硬件的模型推荐结果']},
   {route:'mac/recommend/',markers:['芯片系列','统一内存','模型权重','当前硬件的模型推荐结果']},
+  {route:'mac/',markers:['先选择你使用的 Mac','语言大模型','视频生成']},
+  {route:'mac/chat',markers:['Mac 语言大模型','ollama pull','ollama run']},
+  {route:'mac/image',markers:['Mac 图像模型','ComfyUI Desktop','生成第一张']},
+  {route:'mac/video',markers:['Mac 视频模型','LTX-2.3','Wan2.2']},
+  {route:'mac/audio',markers:['Mac 语音模型','whisper-cli','ggml-base.bin']},
+  {route:'mac/models/ltx23',markers:['Mac LTX-2.3','ltx-2-mlx','ltx23-first.mp4']},
   {route:'guide/start',markers:['我的电脑','想运行什么','确认电脑配置']},
   {route:'guide/deploy',markers:['用你的硬件配置生成下载命令','你的系统','请选择容量']},
   {route:'guide/model-download',markers:['新手下载模型','第一步','第四步']},

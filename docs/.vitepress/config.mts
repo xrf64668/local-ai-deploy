@@ -30,31 +30,34 @@ export default defineConfig({
     ],
     sidebar: {
       '/mac/': [
-        { text: 'Mac 本地 AI 入门', items: [
-          { text: '总览：从哪里开始', link: '/mac/' },
-          { text: '部署路线与目录约定', link: '/mac/roadmap' },
-          { text: 'Mac 容量计算器', link: '/mac/recommend/' },
-          { text: '新手：找模型与下载', link: '/guide/model-download' }
+        { text: '从这里开始', items: [
+          { text: '我的 Mac：选配置和目标', link: '/mac/' },
+          { text: '怎么查看硬件配置', link: '/mac/01-preflight' },
+          { text: '按统一内存选模型', link: '/mac/recommend/' }
         ] },
-        { text: '01–07 部署实践', collapsed: false, items: [
-          { text: '01 · 硬件与系统检查', link: '/mac/01-preflight' },
-          { text: '02 · 独立环境与缓存', link: '/mac/02-environment' },
-          { text: '03 · 选择推理运行时', link: '/mac/03-runtime' },
-          { text: '04 · 选择并下载模型', link: '/mac/04-models' },
-          { text: '05 · 真实生成验证', link: '/mac/05-verify' },
-          { text: '06 · 本地推理与资源控制', link: '/mac/06-inference' },
-          { text: '07 · HTTP API 接入', link: '/mac/07-api' }
+        { text: '按模型类型分别部署', items: [
+          { text: '语言大模型 · Ollama', link: '/mac/chat' },
+          { text: '图像模型 · ComfyUI', link: '/mac/image' },
+          { text: '视频模型 · LTX / Wan', link: '/mac/video' },
+          { text: '语音识别 · Whisper', link: '/mac/audio' }
         ] },
-        { text: '模型专项', items: [
-          { text: 'Ollama：最简单的本地 API', link: '/mac/models/ollama' },
+        { text: '具体模型教程（可选）', collapsed: true, items: [
+          { text: 'Qwen / 其他 · Ollama', link: '/mac/models/ollama' },
+          { text: 'LTX-2.3 · MLX Q4', link: '/mac/models/ltx23' },
           { text: 'LTX-2.5 · MLX Q4', link: '/mac/models/ltx25' },
-          { text: 'LTX · HTTP API + Java 接入', link: '/mac/models/ltx25-api' },
-          { text: 'Wan2.2 · 实验性 MLX', link: '/mac/models/wan22' }
+          { text: 'Wan2.2 · MLX Q8', link: '/mac/models/wan22' },
+          { text: 'LTX HTTP 接入 · 开发者', link: '/mac/models/ltx25-api' }
         ] },
-        { text: '继续学习', items: [
-          { text: 'Mac ComfyUI 安装', link: '/comfyui/mac' },
-          { text: 'Mac 故障排查', link: '/mac/troubleshooting' },
-          { text: '按硬件选模型', link: '/recommend/' }
+        { text: '深入配置与技术原理（可选）', collapsed: true, items: [
+          { text: '部署架构与目录管理', link: '/mac/roadmap' },
+          { text: '01 · 硬件检查', link: '/mac/01-preflight' },
+          { text: '02 · 独立环境与缓存', link: '/mac/02-environment' },
+          { text: '03 · 运行时与框架', link: '/mac/03-runtime' },
+          { text: '04 · 模型来源与下载', link: '/mac/04-models' },
+          { text: '05 · 真实生成验证', link: '/mac/05-verify' },
+          { text: '06 · 内存与资源控制', link: '/mac/06-inference' },
+          { text: '07 · HTTP API 接入', link: '/mac/07-api' },
+          { text: '排查 Mac 常见问题', link: '/mac/troubleshooting' }
         ] }
       ],
       '/comfyui/': [

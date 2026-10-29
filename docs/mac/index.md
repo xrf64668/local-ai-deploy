@@ -39,3 +39,5 @@ ComfyUI Desktop 可通过图形界面安装。只有需要控制 Python、缓存
 LTX 的低负载实践记录只适用于对应的 Mac、权重和推理参数；Wan 的 MLX 方案仍属于实验性路线。**不要把“文件下载完成”视为“模型已经运行成功”。**
 
 本站只存放指南和示例代码，不包含大型模型权重。
+
+**需要把视频模型接入 Java 或 HTTP？** LTX-2.5 已有可运行的 [异步 HTTP Worker 完整教程](/mac/models/ltx25-api)，包含 Python API、`curl`、Java 17 客户端与 MP4 验证；模型的实际运行仍需使用者自己的 Mac 测试。

@@ -31,6 +31,21 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Install dependencies
         run: npm ci
+      - name: Setup Python 3.11 for local HTTP Worker tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify LTX HTTP task lifecycle without downloading weights
+        run: python -m unittest discover -s examples/ltx_http/tests -v
+      - name: Setup Java 17 for client compile check
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile Java HTTP client
+        run: |
+          mkdir -p "$RUNNER_TEMP/ltx-java"
+          javac -encoding UTF-8 -d "$RUNNER_TEMP/ltx-java" examples/ltx_http/LtxApiClient.java
       - name: Build VitePress
         run: npm run docs:build
       - name: Verify interactive model selector in Chrome

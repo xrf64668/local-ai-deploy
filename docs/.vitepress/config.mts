@@ -48,6 +48,7 @@ export default defineConfig({
         { text: '模型专项', items: [
           { text: 'Ollama：最简单的本地 API', link: '/mac/models/ollama' },
           { text: 'LTX-2.5 · MLX Q4', link: '/mac/models/ltx25' },
+          { text: 'LTX · HTTP API + Java 接入', link: '/mac/models/ltx25-api' },
           { text: 'Wan2.2 · 实验性 MLX', link: '/mac/models/wan22' }
         ] },
         { text: '继续学习', items: [

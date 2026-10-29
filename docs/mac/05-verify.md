@@ -41,4 +41,4 @@ ffprobe -v error -show_entries format=duration,size -of json path/to/result.mp4
 例如 512×320、短帧数视频能够生成，不意味着 720P 或较长视频就能稳定运行。分辨率、模型版本、VAE 解码和内存压力都可能改变结果。
 :::
 
-下一步：[06 · 推理与资源控制](/mac/06-inference/)。
+下一步：[06 · 推理与资源控制](/mac/06-inference)。

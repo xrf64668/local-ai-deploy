@@ -12,7 +12,7 @@
 
 ## 方案 A：先用 Ollama 完成 HTTP 闭环
 
-根据 [Ollama 的安装与下载指南](/mac/models/ollama/) 安装并启动支持的模型后，检查：
+根据 [Ollama 的安装与下载指南](/mac/models/ollama) 安装并启动支持的模型后，检查：
 
 ```bash
 curl -f http://127.0.0.1:11434/api/tags
@@ -30,7 +30,7 @@ curl http://127.0.0.1:11434/api/chat \
 
 ## 方案 B：ComfyUI 图像/视频工作流 API
 
-如果模型以 ComfyUI 工作流运行，请先阅读 [ComfyUI API 教程](/comfyui/api/) 与 [完整 Python 调用示例](https://github.com/xrf64668/local-ai-deploy/blob/main/examples/comfyui/submit_workflow.py)。
+如果模型以 ComfyUI 工作流运行，请先阅读 [ComfyUI API 教程](/comfyui/api) 与 [完整 Python 调用示例](https://github.com/xrf64668/local-ai-deploy/blob/main/examples/comfyui/submit_workflow.py)。
 
 注意：ComfyUI 的普通工作流 JSON 不一定等于可执行的 API JSON；应从实际可运行工作流导出 API Format。
 

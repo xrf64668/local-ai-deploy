@@ -16,18 +16,18 @@
 
 ### 想最快接入 HTTP API
 
-先走 [Ollama 新手路线](/mac/models/ollama/)。模型安装完成后可直接调用原生接口；不需要自己发明推理协议。
+先走 [Ollama 新手路线](/mac/models/ollama)。模型安装完成后可直接调用原生接口；不需要自己发明推理协议。
 
 ### 想通过节点做图片/视频
 
-先走 [ComfyUI for Mac](/comfyui/mac/)；这里主要是 PyTorch MPS，不要把 MLX 权重误以为一定能被 ComfyUI 节点读取。
+先走 [ComfyUI for Mac](/comfyui/mac)；这里主要是 PyTorch MPS，不要把 MLX 权重误以为一定能被 ComfyUI 节点读取。
 
 ### 想在 M4/32GB 上尝试视频
 
-先阅读 [LTX-2.5 实践记录](/mac/models/ltx25/) 和 [Wan2.2 实验性方案](/mac/models/wan22/)。只下载与加载器匹配的版本，不要复用其他框架的 `config.json` 或文本编码器。
+先阅读 [LTX-2.5 实践记录](/mac/models/ltx25) 和 [Wan2.2 实验性方案](/mac/models/wan22)。只下载与加载器匹配的版本，不要复用其他框架的 `config.json` 或文本编码器。
 
 ## 通过标准
 
 记录推理后端的准确版本（Git Commit 或包版本）、Python 版本、权重 revision 及内存条件。**仅安装了 Python 包不代表模型已经通过测试**。
 
-下一步：[04 · 模型下载与校验](/mac/04-models/)。
+下一步：[04 · 模型下载与校验](/mac/04-models)。

@@ -31,10 +31,10 @@ memory_pressure -Q
 
 | 目标 | 先阅读 | 适配说明 |
 | --- | --- | --- |
-| 本地文字聊天 | [Ollama](/mac/models/ollama/) | 可从较小的量化语言模型开始 |
-| 节点式图像生成 | [ComfyUI for Mac](/comfyui/mac/) | 多数通过 PyTorch MPS，需选对应模型 |
-| LTX 视频 | [LTX MLX 路线](/mac/models/ltx25/) | 需匹配专用 MLX 权重与运行时 |
-| Wan 视频 | [Wan MLX 路线](/mac/models/wan22/) | 属于实验性验证，避免直接下载大量权重 |
+| 本地文字聊天 | [Ollama](/mac/models/ollama) | 可从较小的量化语言模型开始 |
+| 节点式图像生成 | [ComfyUI for Mac](/comfyui/mac) | 多数通过 PyTorch MPS，需选对应模型 |
+| LTX 视频 | [LTX MLX 路线](/mac/models/ltx25) | 需匹配专用 MLX 权重与运行时 |
+| Wan 视频 | [Wan MLX 路线](/mac/models/wan22) | 属于实验性验证，避免直接下载大量权重 |
 
 ## 常见问题
 
@@ -42,4 +42,4 @@ memory_pressure -Q
 
 **为什么不能只按 M4/M5 推荐模型？** 同一芯片可能搭配不同容量的统一内存；模型量化方式和工作流中间内存也会影响结果。
 
-下一步：[02 · 项目独立环境](/mac/02-environment/)。
+下一步：[02 · 项目独立环境](/mac/02-environment)。

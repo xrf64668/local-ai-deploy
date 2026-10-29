@@ -15,6 +15,9 @@ import secrets
 import shutil
 import signal
 import sqlite3
+import sys
+import urllib.error
+import urllib.request
 import subprocess
 import threading
 import time
@@ -388,5 +391,127 @@ def main():
         manager.close()
 
 
+
+# ---- Beginner commands: use the script's own directory as the project root. ----
+def beginner_key(root: Path, create=False):
+    """Read the project's private key; optionally create it once, never overwrite."""
+    secret_dir = root / ".secrets"
+    key_file = secret_dir / "ltx-api-key"
+    if create:
+        secret_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        secret_dir.chmod(0o700)
+        try:
+            fd = os.open(str(key_file), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        except FileExistsError:
+            pass
+        else:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(secrets.token_urlsafe(36) + "\n")
+    if not key_file.is_file() or key_file.is_symlink():
+        raise RuntimeError("没有安全的本地 API Key；请先运行 python3 worker.py start")
+    if key_file.stat().st_mode & 0o077:
+        raise RuntimeError("API Key 文件权限过宽，请先运行 chmod 600 .secrets/ltx-api-key")
+    value = key_file.read_text(encoding="utf-8").strip()
+    if len(value) < 24:
+        raise RuntimeError("API Key 长度不符合安全要求")
+    return value
+
+
+def beginner_generate(root: Path, prompt: str, base="http://127.0.0.1:18080",
+                      poll_interval=2.0, timeout=7200):
+    """Create job, poll, and retrieve a real MP4. Never reports success while queued."""
+    if not isinstance(prompt, str) or not 1 <= len(prompt.strip()) <= 1500:
+        raise ValueError("视频描述需要 1–1500 个字符")
+    key = beginner_key(root)
+    base = base.rstrip("/")
+
+    def api(method, path, payload=None):
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8") if payload is not None else None
+        headers = {"X-API-Key": key}
+        if body is not None:
+            headers["Content-Type"] = "application/json"
+        req = urllib.request.Request(base + path, data=body, method=method, headers=headers)
+        try:
+            return urllib.request.urlopen(req, timeout=20)
+        except urllib.error.HTTPError as exc:
+            detail = exc.read(1500).decode("utf-8", errors="replace")
+            raise RuntimeError(f"HTTP {exc.code}: {detail}") from exc
+        except urllib.error.URLError as exc:
+            raise RuntimeError("无法连接本地视频服务；请在另一个终端先运行 python3 worker.py start") from exc
+
+    with api("POST", "/v1/video/jobs", {"prompt": prompt.strip()}) as res:
+        if res.status != 202:
+            raise RuntimeError("服务器未接受新任务 (HTTP " + str(res.status) + ")")
+        job = json.load(res)
+    jid = job["job_id"]
+    if not (isinstance(jid, str) and len(jid) == 32 and all(c in "0123456789abcdef" for c in jid)):
+        raise RuntimeError("服务器返回的任务编号无效")
+    print("已提交视频任务：" + jid, flush=True)
+    state = None
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        with api("GET", "/v1/video/jobs/" + jid) as res:
+            job = json.load(res)
+        latest = job.get("status")
+        if latest != state:
+            messages = {"queued": "正在排队", "running": "正在生成视频",
+                        "succeeded": "生成完成，正在保存视频",
+                        "failed": "生成失败", "canceled": "任务已取消"}
+            print(messages.get(latest, str(latest)), flush=True)
+            state = latest
+        if latest == "succeeded":
+            break
+        if latest in ("failed", "canceled"):
+            raise RuntimeError("任务未完成：" + str(job.get("error") or latest)
+                               + "\n请查看项目 logs/" + jid + ".log")
+        time.sleep(poll_interval)
+    else:
+        raise RuntimeError("客户端等待超时；任务可能仍在执行。任务编号：" + jid)
+
+    folder = root / "outputs"
+    folder.mkdir(parents=True, exist_ok=True)
+    outfile = folder / ("http-" + jid + ".mp4")
+    partial = folder / ("http-" + jid + ".mp4.part")
+    try:
+        with api("GET", "/v1/video/jobs/" + jid + "/result") as response:
+            if response.status != 200 or response.headers.get_content_type() != "video/mp4":
+                raise RuntimeError("服务器未返回 MP4 视频")
+            with partial.open("wb") as output:
+                shutil.copyfileobj(response, output, 1024 * 1024)
+        if partial.stat().st_size <= 0:
+            raise RuntimeError("收到的 MP4 文件为空")
+        partial.replace(outfile)
+    finally:
+        partial.unlink(missing_ok=True)
+    print("视频已保存到：" + str(outfile), flush=True)
+    print("如视频无法播放，请用 ffprobe 核对文件格式。", flush=True)
+    return outfile
+
+
+def beginner_main(argv):
+    parser = argparse.ArgumentParser(
+        description="LTX 新手入口：start 启动本地 HTTP 服务；generate 自动等待并下载视频")
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("start", help="在当前项目内自动生成 API Key 并启动服务")
+    gen = sub.add_parser("generate", help="提交视频生成任务，并在完成后自动下载 MP4")
+    gen.add_argument("prompt", help="你希望生成的视频内容")
+    args = parser.parse_args(argv)
+    # The downloaded script always lives directly inside the user's project.
+    root = Path(__file__).resolve().parent
+    if args.command == "start":
+        token = beginner_key(root, create=True)
+        env = os.environ.copy()
+        env["LTX_API_KEY"] = token
+        # Reuse the original secure localhost server path without an extra shell.
+        os.execve(sys.executable,
+                  [sys.executable, str(Path(__file__).resolve()), "--project-root", str(root), "--port", "18080"],
+                  env)
+    if args.command == "generate":
+        beginner_generate(root, args.prompt)
+
+
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] in ("start", "generate"):
+        beginner_main(sys.argv[1:])
+    else:
+        main()

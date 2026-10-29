@@ -11,7 +11,7 @@ from pathlib import Path
 from sys import path as python_path
 
 python_path.insert(0, str(Path(__file__).resolve().parents[1]))
-from worker import JobManager, build_command, create_server, validate_request
+from worker import JobManager, beginner_key, beginner_generate, build_command, create_server, validate_request
 
 
 class ValidationTests(unittest.TestCase):
@@ -112,6 +112,26 @@ class ServerTests(unittest.TestCase):
         self.assertTrue((self.root / "outputs" / (jid + ".mp4")).exists())
         self.assertTrue((self.root / "logs" / (jid + ".log")).exists())
         self.assertTrue((self.root / "jobs" / "video-jobs.sqlite3").exists())
+
+    def test_beginner_workflow_without_copying_keys_or_job_ids(self):
+        token = beginner_key(self.root, create=True)
+        self.assertGreater(len(token), 24)
+        self.assertEqual(beginner_key(self.root, create=True), token)
+        (self.root / ".secrets" / "ltx-api-key").write_text(self.token + "\n")
+        (self.root / ".secrets" / "ltx-api-key").chmod(0o600)
+        result = beginner_generate(self.root, "A small boat on a lake", self.base,
+                                   poll_interval=.02, timeout=10)
+        self.assertTrue(result.is_file())
+        self.assertTrue(result.name.startswith("http-"))
+        self.assertEqual(result.read_bytes()[-12:], b"ftypfakefile")
+        self.assertEqual(list(self.root.glob("outputs/*.part")), [])
+
+    def test_beginner_key_rejects_insecure_permissions(self):
+        key = beginner_key(self.root, create=True)
+        file = self.root / ".secrets" / "ltx-api-key"
+        file.chmod(0o644)
+        with self.assertRaises(RuntimeError):
+            beginner_key(self.root)
 
     def test_validation_and_missing_jobs(self):
         code, response = self.call("POST", "/v1/video/jobs", {"prompt": "x", "frames": 24})

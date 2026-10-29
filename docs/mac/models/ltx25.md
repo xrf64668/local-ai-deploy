@@ -119,89 +119,18 @@ ffprobe -v error -show_entries format=duration,size -of json "$PROJECT_ROOT/outp
 如果输出不存在或 ffprobe 报错，应记录实际系统、内存压力、代码提交、模型 revision、分辨率及帧数再排查。
 
 
-## 08 · 把真实视频生成封装为 HTTP API
+## 08 · 想让其他程序调用 LTX？（可选）
 
-前面已经通过 `ltx-2-mlx generate` 生成 MP4，但这仍是**命令行操作**。如果你希望 Java 后端、自动化程序或本地网页使用 HTTP 请求生成视频，可以启动本站提供的 [LTX 本地 HTTP Worker](/mac/models/ltx25-api)。
+前面已经完成了**命令行生成视频**。如果你只想在 Mac 上制作视频，做到第 07 步就可以了，**不必学习 HTTP API**。
 
-**这不是 LTX 上游自带的 HTTP 接口**：Worker 会调用你刚才安装的真正 MLX CLI。开始前，请确认第 06 和第 07 步已在你自己的 Mac 上运行成功。
+如果你希望通过 Java、其他工具或自动化程序提交视频生成任务，可以继续使用本站提供的本地 HTTP 服务。它会调用你已安装的 LTX 推理工具，并非 LTX 官方自带 API。
 
-### 第一步：将 API 程序保存到你选择的项目目录
+**新手只需要：** 下载一个服务文件 → 启动本地服务 → 输入一句视频描述。任务查询、等待生成和下载 MP4 由程序自动完成，不用手动复制 API Key、任务编号或 JSON。
 
-继续在已设置 `PROJECT_ROOT` 的终端里执行：
+[**进入 LTX 本地 HTTP 三步入门教程 →**](/mac/models/ltx25-api)
 
-~~~bash
-curl -fL https://raw.githubusercontent.com/xrf64668/local-ai-deploy/main/examples/ltx_http/worker.py \
-  -o "$PROJECT_ROOT/worker.py"
-python3 -m py_compile "$PROJECT_ROOT/worker.py"
-~~~
-
-成功标志：Python 语法检查没有报错。下载的文件只是 HTTP 服务代码，不会重复下载权重；请先审阅代码，长期部署时建议固定 Git Commit。
-
-### 第二步：创建仅用于本地的 API 密钥
-
-~~~bash
-mkdir -p "$PROJECT_ROOT/.secrets"
-chmod 700 "$PROJECT_ROOT/.secrets"
-python3 -c 'import secrets; print(secrets.token_urlsafe(36))' > "$PROJECT_ROOT/.secrets/ltx-api-key"
-chmod 600 "$PROJECT_ROOT/.secrets/ltx-api-key"
-export LTX_API_KEY="$(cat "$PROJECT_ROOT/.secrets/ltx-api-key")"
-~~~
-
-密钥只保存在你的 LTX 项目中，**不要公开或提交 Git**。
-
-### 第三步：启动 HTTP 服务
-
-~~~bash
-python3 "$PROJECT_ROOT/worker.py" --project-root "$PROJECT_ROOT" --port 18080
-~~~
-
-这是常驻服务，保持这个终端运行。在**另一个终端**里进入同一个项目目录，重新设置 `PROJECT_ROOT` 和密钥：
-
-~~~bash
-# 将终端当前目录切换到你选好的 LTX 项目文件夹后执行
-PROJECT_ROOT="$(pwd -P)"
-export LTX_API_KEY="$(cat "$PROJECT_ROOT/.secrets/ltx-api-key")"
-curl -fsS http://127.0.0.1:18080/health
-~~~
-
-返回 `{"status":"ok",...}` 表示 HTTP Worker 已启动，但**还没有证明真实生成成功**。
-
-### 第四步：通过 HTTP 真正创建一个视频任务
-
-~~~bash
-curl -sS -X POST http://127.0.0.1:18080/v1/video/jobs \
-  -H "X-API-Key: $LTX_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"prompt":"A small paper boat on a lake","width":512,"height":320,"frames":25,"frame_rate":24}'
-~~~
-
-返回 HTTP 202、`job_id` 和 `queued`。复制实际生成的 job_id：
-
-~~~bash
-JOB_ID="替换为上一步的真实32位job_id"
-curl -sS -H "X-API-Key: $LTX_API_KEY" \
-  "http://127.0.0.1:18080/v1/video/jobs/$JOB_ID"
-~~~
-
-状态可能是 `queued`、`running`、`succeeded`、`failed` 或 `canceled`。**只有 succeeded 才表示 CLI 执行完成且输出通过视频格式检查。**
-
-### 第五步：用 HTTP 下载实际 MP4
-
-~~~bash
-curl -fL -H "X-API-Key: $LTX_API_KEY" \
-  "http://127.0.0.1:18080/v1/video/jobs/$JOB_ID/result" \
-  -o "$PROJECT_ROOT/outputs/http-result.mp4"
-
-ffprobe -v error -show_entries format=duration,size \
-  -of json "$PROJECT_ROOT/outputs/http-result.mp4"
-~~~
-
-能播放视频、`ffprobe` 正常解析，才算 HTTP 全链路真正成功。
-
-**Java 17 也有可直接运行的客户端**：访问 [HTTP API 专项教程](/mac/models/ltx25-api)，获取完整 `HttpClient` 源码和任务取消方式。
-
-::: warning 安全默认值
-演示服务**只允许 127.0.0.1 本机调用**，使用 API Key，视频生成任务单线程排队。它不含公网生产级的网关、TLS、限流和多租户授权，请不要直接对互联网暴露。
+::: tip 已有后端开发经验？
+同一教程的进阶区域保留完整 `curl`、任务接口、取消操作和 Java 17 客户端；基础教程不会强迫所有读者先学习这些概念。
 :::
 
 **本页状态：已核对上游下载仓库与命令接口，未对每一种 Mac 与权重组合实机验证。**

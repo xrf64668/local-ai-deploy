@@ -36,6 +36,9 @@ curl http://127.0.0.1:11434/api/chat \
 
 ## 方案 C：LTX-2.5 CLI → 真正 HTTP Worker
 
+**新手建议直接使用 [三步入门](/mac/models/ltx25-api)：** 下载 Worker → 输入 `python3 worker.py start` 启动 → 在第二个终端执行 `python3 worker.py generate "你的视频描述"`，脚本会自动提交、等待并下载 MP4。不需要自己处理密钥和任务编号。
+
+
 **现在已经提供可运行的实现：** [LTX-2.5 本地 HTTP API 完整教程](/mac/models/ltx25-api) · [Python Worker 源码](https://github.com/xrf64668/local-ai-deploy/blob/main/examples/ltx_http/worker.py) · [Java 17 HttpClient 完整示例](https://github.com/xrf64668/local-ai-deploy/blob/main/examples/ltx_http/LtxApiClient.java)。
 
 在用户自己的 LTX 项目目录中下载 `worker.py`，启动后可发 POST 创建异步任务，GET 查询状态，再从 GET `/result` 下载通过 ffprobe 校验的真实 MP4。

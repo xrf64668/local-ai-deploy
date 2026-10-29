@@ -5,7 +5,7 @@
 | 报错或现象 | 常见原因 | 优先处理 |
 | --- | --- | --- |
 | 8188 打不开 | 服务没启动/端口冲突 | 检查启动日志、实际端口与监听地址 |
-| 缺少模型 | 下载位置不对、文件不全 | [检查模型路径](/comfyui/models-and-paths/) |
+| 缺少模型 | 下载位置不对、文件不全 | [检查模型路径](/comfyui/models-and-paths) |
 | Missing node type | 自定义节点未安装或不兼容 | 核对节点仓库来源、版本与导入错误 |
 | `CUDA: False` | PyTorch wheel、驱动、显卡架构不匹配 | 先运行 GPU 检查，不继续下载模型 |
 | `MPS: False` | 非 Apple Silicon 或 PyTorch/系统不兼容 | 核对 arm64、macOS、torch 版本 |
@@ -21,4 +21,4 @@
 4. 如果基本工作流成功，再逐个增加 LoRA、视频节点或扩展插件。
 5. 对外分享日志时隐藏密钥、文件路径中的个人信息以及私有模型链接。
 
-相关页面：[Mac](/comfyui/mac/) · [Ubuntu](/comfyui/ubuntu/) · [Windows](/comfyui/windows/) · [API](/comfyui/api/)。
+相关页面：[Mac](/comfyui/mac) · [Ubuntu](/comfyui/ubuntu) · [Windows](/comfyui/windows) · [API](/comfyui/api)。

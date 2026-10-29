@@ -28,4 +28,4 @@
 
 可以通过 **ComfyUI 支持的额外模型目录配置** 让不同实例读取已有模型文件，但先确认读写权限、版本兼容和目录映射。不要随意移动已经成功运行的其他项目的权重。
 
-详细参考 [ComfyUI 官方文档](https://docs.comfy.org/) 与 [第一次生成](/comfyui/first-workflow/)。
+详细参考 [ComfyUI 官方文档](https://docs.comfy.org/) 与 [第一次生成](/comfyui/first-workflow)。

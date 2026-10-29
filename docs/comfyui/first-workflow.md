@@ -1,6 +1,6 @@
 # ComfyUI · 生成第一张图片
 
-本页适合刚完成 [Mac](/comfyui/mac/)、[Ubuntu](/comfyui/ubuntu/) 或 [Windows](/comfyui/windows/) 安装的用户。**目标不是只打开界面，而是实际生成一张可打开的图片。**
+本页适合刚完成 [Mac](/comfyui/mac)、[Ubuntu](/comfyui/ubuntu) 或 [Windows](/comfyui/windows) 安装的用户。**目标不是只打开界面，而是实际生成一张可打开的图片。**
 
 ## 01 · 检查准备状态
 
@@ -23,7 +23,7 @@
 
 根据工作流提示分别放入 Checkpoints / Diffusion Models / VAE / LoRA / Text Encoders 等对应目录。不同模型不一定使用同一组组件。
 
-[详细了解模型目录](/comfyui/models-and-paths/)
+[详细了解模型目录](/comfyui/models-and-paths)
 
 ## 04 · 先运行低负载参数
 
@@ -45,4 +45,4 @@
 
 ## 06 · 下一步做什么
 
-完成首次生成后，再开始尝试 [ComfyUI API](/comfyui/api/)；它需要从已跑通的工作流导出 API 格式 JSON。遇到问题先看 [排错清单](/comfyui/troubleshooting/)。
+完成首次生成后，再开始尝试 [ComfyUI API](/comfyui/api)；它需要从已跑通的工作流导出 API 格式 JSON。遇到问题先看 [排错清单](/comfyui/troubleshooting)。

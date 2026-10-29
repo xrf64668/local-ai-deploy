@@ -49,3 +49,11 @@
 .vp-doc .custom-block.details summary { font-weight: 600; cursor: pointer; }
 .vp-doc table td { min-width: 6rem; }
 .vp-doc div[class*='language-'] + p { margin-top: .9rem; }
+
+/* Visible fallback when a client-only capacity widget has not mounted. */
+.vp-doc .calculator-load-fallback{
+  margin:1rem 0 2rem;padding:1.2rem;
+  border:1px solid var(--vp-c-divider);border-radius:12px;
+  background:var(--vp-c-bg-soft);
+}
+.vp-doc .calculator-load-fallback p{font-size:.9rem;margin:.55rem 0}

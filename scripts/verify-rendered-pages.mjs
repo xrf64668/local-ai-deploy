@@ -4,8 +4,8 @@ import { join } from 'node:path'
 
 const root = 'docs/.vitepress/dist'
 const cases = [
-  {route:'recommend/',markers:['运行平台','统一内存','模型权重','当前硬件的模型推荐结果']},
-  {route:'mac/recommend/',markers:['芯片系列','统一内存','模型权重','当前硬件的模型推荐结果']},
+  {route:'recommend/',markers:['交互式硬件容量计算器','正在加载交互式计算面板','Mac 选型']},
+  {route:'mac/recommend/',markers:['Mac 交互式容量计算器','正在加载 Mac 模型容量计算器','打开 Mac 配置']},
   {route:'ubuntu/',markers:['确认自己的电脑配置','语言模型','视频模型']},
   {route:'windows/',markers:['确认自己的电脑配置','图像模型','语音识别']},
   {route:'ubuntu/chat',markers:['Ubuntu 语言模型','安装 Ollama','从官方模型库下载并运行']},

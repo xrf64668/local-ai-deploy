@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: 本地 AI 部署指南
-  text: 从第一次安装，到真正运行模型
-  tagline: Mac / Ubuntu / Windows · 逐步命令、成功标志、错误排查、ComfyUI 和 API 接入
+  name: 本地 AI 实战指南
+  text: 从选对模型，到真实运行
+  tagline: Mac / Ubuntu / Windows · 硬件选型 · 国内外模型下载 · ComfyUI · 本地 API
   actions:
     - theme: brand
       text: 选择我的部署路线

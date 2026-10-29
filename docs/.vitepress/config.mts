@@ -1,14 +1,22 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: '本地 AI 模型部署指南',
-  description: 'Mac、Ubuntu、Windows 上从硬件检查、模型部署到 ComfyUI 和 API 接入的中文实战教程',
+  title: '本地 AI 实战指南',
+  description: '从硬件选型、模型下载到本地推理与 API 接入，适用于 Mac、Ubuntu 和 Windows 的中文实战教程',
   lang: 'zh-CN',
   base: '/local-ai-deploy/',
   lastUpdated: true,
+  head: [
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/local-ai-deploy/favicon.svg' }],
+    ['link', { rel: 'alternate icon', type: 'image/x-icon', href: '/local-ai-deploy/favicon.ico' }],
+    ['meta', { name: 'theme-color', content: '#182C62' }],
+    ['meta', { property: 'og:site_name', content: '本地 AI 实战指南' }],
+    ['meta', { property: 'og:title', content: '本地 AI 实战指南 · 从选模型到真实运行' }],
+    ['meta', { property: 'og:description', content: '从硬件选型、模型下载到本地推理与 API 接入，适用于 Mac、Ubuntu 和 Windows 的中文实战教程' }]
+  ],
   cleanUrls: false,
   themeConfig: {
-    logo: undefined,
+    logo: '/logo.svg',
     nav: [
       { text: '首页', link: '/' },
       { text: '开始部署', link: '/guide/start' },

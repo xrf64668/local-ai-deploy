@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { withBase } from 'vitepress'
 import { OLLAMA_MODELS, shortlistOllama } from '../../data/ollama-catalog.mjs'
 import { videoRecommendations } from '../../data/model-video.mjs'
 
@@ -26,14 +27,15 @@ const suggested = computed(() => validHardware.value ? shortlistOllama({
 }).rows.filter((r: any) => r.tier !== 'over' && disk.value >= r.model.downloadGB + 2) : [])
 const videos = computed(() => validHardware.value
   ? videoRecommendations({ platform: 'mac', memoryGb: memory.value, diskGb: disk.value, vramGb: 0 }) : [])
-const selected = computed(() => OLLAMA_MODELS.find((m: any) => m.id === modelId.value))
-const video = computed(() => videos.value.find((v: any) => v.model.id === modelId.value))
+const selected = computed(() => task.value === 'chat' && suggested.value.some((r: any) => r.model.id === modelId.value) ? OLLAMA_MODELS.find((m: any) => m.id === modelId.value) : undefined)
+const video = computed(() => task.value === 'video' ? videos.value.find((v: any) => v.eligible && v.model.id === modelId.value) : undefined)
 const canNext = computed(() => {
   if (step.value === 0) return validHardware.value
-  if (step.value === 2) return Boolean(modelId.value)
+  if (step.value >= 2) return modelOptions.value.some((m: any) => m.id === modelId.value)
   return true
 })
-const guide = computed(() => ({ chat: '/mac/chat', image: '/mac/image', video: '/mac/video', audio: '/mac/audio' })[task.value])
+const guide = computed(() => withBase(video.value?.model.guide || ({ chat: '/mac/chat', image: '/mac/image', video: '/mac/video', audio: '/mac/audio' })[task.value]))
+const apiGuide = withBase('/mac/models/ollama')
 const storageKey = 'local-ai-deploy:mac-wizard:v2'
 const modelOptions = computed(() => task.value === 'chat'
   ? suggested.value.map((r: any) => ({ id: r.model.id, title: r.model.name, detail: `约 ${r.model.downloadGB} GB 下载 · 容量估算` }))
@@ -46,8 +48,14 @@ function next() {
   if (step.value === 2 && !modelOptions.value.some((m: any) => m.id === modelId.value)) modelId.value = ''
 }
 function back() { step.value = Math.max(0, step.value - 1) }
-function chooseTask(value: Task) { task.value = value; modelId.value = ''; confirmed.value = false }
-function copy(value: string) { if (typeof navigator !== 'undefined' && navigator.clipboard) navigator.clipboard.writeText(value).then(() => status.value = '命令已复制').catch(() => status.value = '复制失败，请手动选择命令') }
+function chooseTask(value: Task) { if (task.value === value) return; task.value = value; modelId.value = ''; confirmed.value = false }
+function chooseModel(value: string) { if(modelId.value === value) return; modelId.value = value; confirmed.value = false }
+function reset() { step.value = 0; chip.value = ''; memory.value = 0; disk.value = 0; task.value = 'chat'; modelId.value = ''; confirmed.value = false; status.value = '' }
+function copy(value: string) { if (typeof navigator === 'undefined' || !navigator.clipboard) { status.value = '当前页面无法访问剪贴板，请手动选择命令'; return } navigator.clipboard.writeText(value).then(() => status.value = '命令已复制').catch(() => status.value = '复制失败，请手动选择命令') }
+watch([chip, memory, disk], () => {
+  if (modelId.value && !modelOptions.value.some((m: any) => m.id === modelId.value)) { modelId.value = ''; confirmed.value = false; step.value = Math.min(step.value, 2) }
+  else confirmed.value = false
+})
 watch([step, chip, memory, disk, task, modelId, confirmed], () => {
   if (typeof window !== 'undefined') localStorage.setItem(storageKey, JSON.stringify({
     step: step.value, chip: chip.value, memory: memory.value, disk: disk.value,
@@ -66,6 +74,8 @@ onMounted(() => {
       if (typeof saved.modelId === 'string') modelId.value = saved.modelId
       if (Number.isInteger(saved.step)) step.value = Math.max(0, Math.min(5, saved.step))
       confirmed.value = saved.confirmed === true
+      if (!validHardware.value) step.value = 0
+      else if (step.value >= 2 && !modelOptions.value.some((m: any) => m.id === modelId.value)) { modelId.value = ''; confirmed.value = false; step.value = 2 }
     }
     const q = new URLSearchParams(location.search)
     const t = q.get('task')
@@ -78,7 +88,7 @@ onMounted(() => {
   <section class="unified-wizard" aria-label="Mac 单页部署向导">
     <div class="wizard-top">
       <div><p class="eyebrow">LOCAL AI DEPLOY · V2</p><h2>从电脑配置到第一次运行</h2><p>每次只完成一步，不离开当前页面。配置会保存在本浏览器中。</p></div>
-      <button class="ghost" type="button" @click="step=0;chip='';memory=0;disk=0;task='chat';modelId='';confirmed=false">重新开始</button>
+      <button class="ghost" type="button" @click="reset">重新开始</button>
     </div>
     <nav class="steps" aria-label="部署进度">
       <button v-for="(title,index) in headings" :key="title" type="button" :class="{active:step===index,done:index<step}" :disabled="index>step" :aria-current="step===index?'step':undefined" @click="step=index">
@@ -94,7 +104,7 @@ onMounted(() => {
           <label>统一内存<select v-model.number="memory"><option :value="0">请选择</option><option v-for="v in [8,16,18,24,32,36,48,64,96,128,192,256]" :key="v" :value="v">{{v}} GB</option></select></label>
           <label>可用磁盘<select v-model.number="disk"><option :value="0">请选择</option><option v-for="v in [10,20,30,40,60,80,100,120,160,256,512,1024]" :key="v" :value="v">{{v}} GB</option></select></label>
         </div>
-        <p class="muted">这是手动填写，不是网站自动检测；内存容量仅用于初筛，不能证明运行性能。</p>
+        <p class="muted">这是手动填写，不是网站自动检测；内存容量仅用于初筛，不能证明运行性能。修改硬件信息后，之前的推理确认会失效。</p>
       </template>
       <template v-else-if="step===1">
         <h3>02 · 这次要运行什么模型？</h3>
@@ -104,7 +114,7 @@ onMounted(() => {
       <template v-else-if="step===2">
         <h3>03 · 选具体的部署目标</h3>
         <p class="muted">按 {{ memory }} GB 内存和 {{ disk }} GB 剩余磁盘进行容量初筛；这不是速度测试或实机兼容认证。</p>
-        <div v-if="modelOptions.length" class="models"><button v-for="m in modelOptions" :key="m.id" type="button" :class="{picked:modelId===m.id}" @click="modelId=m.id;confirmed=false"><strong>{{m.title}}</strong><small>{{m.detail}}</small></button></div>
+        <div v-if="modelOptions.length" class="models"><button v-for="m in modelOptions" :key="m.id" type="button" :class="{picked:modelId===m.id}" @click="chooseModel(m.id)"><strong>{{m.title}}</strong><small>{{m.detail}}</small></button></div>
         <p v-else class="notice">当前目录没有通过容量初筛的候选。请返回修改硬件预算，或查看技术文档了解更小的模型。</p>
         <p v-if="task==='video'" class="muted">未通过视频模型参考门槛的候选已隐藏；LTX 与 Wan 的运行环境不能互相套用。</p>
       </template>
@@ -137,7 +147,7 @@ onMounted(() => {
           <p>输入 <code>/bye</code> 退出。不要把服务启动或模型下载完成误认为推理成功。</p>
           <label class="check"><input v-model="confirmed" type="checkbox"> 我已经在本机收到模型的实际回答</label>
           <p v-if="confirmed" class="success">已由你确认本机推理成功。网站未远程核验此结果。</p>
-          <details><summary>可选：从 Java 或其他程序使用 HTTP API</summary><p>Ollama 服务运行后可以用以下命令检查本地接口（不是独立的安装步骤）：</p><div class="command"><code>curl http://127.0.0.1:11434/api/tags</code><button type="button" @click="copy('curl http://127.0.0.1:11434/api/tags')">复制</button></div><p>响应模型列表后，可进一步阅读 <a href="/mac/models/ollama">Ollama API 进阶说明</a>。</p></details>
+          <details><summary>可选：从 Java 或其他程序使用 HTTP API</summary><p>Ollama 服务运行后可以用以下命令检查本地接口（不是独立的安装步骤）：</p><div class="command"><code>curl http://127.0.0.1:11434/api/tags</code><button type="button" @click="copy('curl http://127.0.0.1:11434/api/tags')">复制</button></div><p>响应模型列表后，可进一步阅读 <a :href="apiGuide">Ollama API 进阶说明</a>。</p></details>
         </template>
         <template v-else><p class="notice">请先完成专项教程中的真实图片、MP4 或文字转录验收。此类型尚未接入 V2 的可核验单页步骤。</p><a :href="guide" class="secondary-link">打开原有完整验证教程 →</a></template>
       </template>

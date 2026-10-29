@@ -1,17 +1,16 @@
-# 工具选型
+# 本地 AI 工具怎么选？
 
-## 大语言模型
+不用一次安装所有工具。**先按想完成的任务选择一条路线。**
 
-- **Ollama**：快速部署和本地 API，适合入门。
-- **llama.cpp**：支持 GGUF 量化，配置灵活。
-- **vLLM**：通常用于 Linux GPU 服务器高吞吐推理。
+| 想做什么 | 建议先了解 | 原因 |
+| --- | --- | --- |
+| 本地聊天与 HTTP API | **Ollama** | 安装与调用相对直接，适合第一次体验 |
+| 运行 GGUF 量化语言模型 | **llama.cpp** | 配置灵活，适合进阶调试 |
+| 图像生成与节点工作流 | **ComfyUI** | 可视化连接模型、采样和输出步骤 |
+| Apple Silicon 专用推理 | **MLX 与适配的运行时** | 需匹配模型权重及对应加载器 |
+| Linux GPU 高吞吐文本服务 | **vLLM** | 更适合具备 GPU 与服务部署经验的读者 |
+| 用 Python 编排生成流程 | **Diffusers** | 便于写脚本与集成 |
 
-## 图像与视频生成
+**推荐给第一次使用的人：** Mac 先试 [Ollama](/mac/models/ollama) 或 [ComfyUI Desktop](/comfyui/mac)；Windows 可从 [ComfyUI Desktop](/comfyui/windows) 开始。
 
-- **ComfyUI**：节点工作流，适配多类图像与视频方案。
-- **Diffusers**：Python 推理库，便于脚本集成。
-- **MLX / 专用适配器**：面向 Apple Silicon，但必须校验模型和运行时是否配套。
-
-## 语音模型
-
-根据需求选择语音识别、语音合成或语音转换工具，并优先参考项目官方兼容矩阵。
+专用视频模型更依赖版本与显存条件，先阅读 [Mac LTX](/mac/models/ltx25) 或 [Wan](/mac/models/wan22) 的适配说明，不必立即下载大型权重。

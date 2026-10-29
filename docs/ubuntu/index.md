@@ -1,10 +1,14 @@
-# Ubuntu GPU 服务器
+# Ubuntu · NVIDIA 本地 AI
 
-面向 Ubuntu + NVIDIA GPU 的本地 AI 模型部署。
+从下面两条路线中选择，按步骤安装并完成一次真实生成。
 
-## 计划覆盖
+| 目标 | 教程 | 完成标志 |
+| --- | --- | --- |
+| 运行普通本地聊天模型 | [Ollama 安装与模型对话](/ubuntu/ollama) | 模型返回文字回答 |
+| 运行图像生成工作流 | [ComfyUI 安装与 GPU 验证](/comfyui/ubuntu) | 生成并打开图片 |
+| 检查显卡与容量 | [硬件基础](/guide/hardware) · [模型容量计算](/recommend/) | 了解显存预算与模型估算 |
+| 通过程序调用工作流 | [ComfyUI API](/comfyui/api) | 提交任务并查询结果 |
 
-- NVIDIA 驱动、CUDA 与 GPU 状态
-- 显存与 PCIe / 功率 / 时钟检查
-- vLLM、ComfyUI、Diffusers 等推理运行时
-- 模型服务、鉴权、任务队列和故障恢复
+先执行 `nvidia-smi` 检查显卡与驱动。如果显卡无法正常读取，应先修复驱动再安装 CUDA 依赖。
+
+更多任务可通过 [部署路线向导](/guide/start) 选择。视频生成、大规模并发与多 GPU 部署需要进一步核对对应运行时的实际资源需求。

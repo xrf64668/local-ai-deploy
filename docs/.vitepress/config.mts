@@ -11,10 +11,10 @@ export default defineConfig({
     logo: undefined,
     nav: [
       { text: '首页', link: '/' },
-      { text: '从这里开始', link: '/guide/what-is-local-ai' },
+      { text: '开始部署', link: '/guide/start' },
       { text: 'Mac 实战', link: '/mac/' },
       { text: 'ComfyUI', link: '/comfyui/' },
-      { text: '按硬件选模型', link: '/recommend/' },
+      { text: '容量计算', link: '/recommend/' },
       { text: '其他平台', items: [
         { text: 'Ubuntu NVIDIA', link: '/ubuntu/' },
         { text: 'Windows NVIDIA', link: '/windows/' }
@@ -67,6 +67,7 @@ export default defineConfig({
       ],
       '/guide/': [
         { text: '基础知识', items: [
+          { text: '部署路线选择', link: '/guide/start' },
           { text: '什么是本地 AI 部署', link: '/guide/what-is-local-ai' },
           { text: '硬件、显存与统一内存', link: '/guide/hardware' },
           { text: '如何选择工具', link: '/guide/choose-tool' }
@@ -79,7 +80,8 @@ export default defineConfig({
       ],
       '/recommend/': [
         { text: '模型选型', items: [
-          { text: '按硬件配置筛选', link: '/recommend/' },
+          { text: '交互式容量计算', link: '/recommend/' },
+          { text: '公式与假设', link: '/recommend/how-it-works' },
           { text: 'Mac 七阶段实战', link: '/mac/' },
           { text: 'ComfyUI 入口', link: '/comfyui/' }
         ] }
@@ -87,6 +89,7 @@ export default defineConfig({
       '/ubuntu/': [
         { text: 'Ubuntu NVIDIA', items: [
           { text: 'Ubuntu 主页', link: '/ubuntu/' },
+          { text: 'Ollama 本地模型', link: '/ubuntu/ollama' },
           { text: 'ComfyUI 安装', link: '/comfyui/ubuntu' },
           { text: '按显存推荐模型', link: '/recommend/' }
         ] }
@@ -94,6 +97,7 @@ export default defineConfig({
       '/windows/': [
         { text: 'Windows NVIDIA', items: [
           { text: 'Windows 主页', link: '/windows/' },
+          { text: 'Ollama 本地模型', link: '/windows/ollama' },
           { text: 'ComfyUI 安装', link: '/comfyui/windows' },
           { text: '按显存推荐模型', link: '/recommend/' }
         ] }

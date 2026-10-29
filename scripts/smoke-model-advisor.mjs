@@ -101,7 +101,7 @@ try {
     control.value='4'
     control.dispatchEvent(new Event('change',{bubbles:true}))
   })()`)
-  assert.ok(await retry(() => evaluate("document.querySelector('.verdict')?.textContent.includes('超出当前全 GPU 预算')"), '4GB 显存应显示容量不足'))
+  assert.ok(await retry(() => evaluate("document.querySelector('.recommend-highlight h4')?.textContent.includes('1.5B') && document.querySelector('.unavailable-models')?.textContent.includes('7B')"), '4GB 显存应推荐较小模型并将 7B 标记容量不足'))
   console.log('[PASS] Mac → Ubuntu → 4GB 显存，推荐结果按选项重新计算')
   // 每个内存档位必须变化推荐型号，而不只是改变剩余数字。
   await evaluate("(() => { const p=[...document.querySelectorAll('.calculator label')].find(x=>x.textContent.includes('运行平台')).querySelector('select'); p.value='mac';p.dispatchEvent(new Event('change',{bubbles:true})); })()")

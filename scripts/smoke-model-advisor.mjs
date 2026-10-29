@@ -212,6 +212,32 @@ try {
     assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),'专属文档 '+route))
   }
   console.log('[PASS] 五篇 Mac 独立教程可直接访问')
+
+  // Linux and Windows share the same information architecture as Mac:
+  // choose hardware → model type → task-specific guide.
+  for (const platform of ['ubuntu','windows']){
+    await navigate('/'+platform+'/')
+    assert.ok(await retry(() => evaluate("!!document.querySelector('.nvidia-goal-advisor .purpose-grid') && document.querySelectorAll('.nvidia-goal-advisor .purpose-card').length===4"), platform+' 四大模型类型入口缺失'))
+    assert.ok(await evaluate("!!document.querySelector('.nvidia-goal-advisor .empty')"),platform+' 尚未填写硬件不应显示推荐')
+    await evaluate("(() => {const ss=document.querySelectorAll('.nvidia-goal-advisor .config-grid select');for(const [i,v] of ['32','12','80'].entries()){ss[i].value=v;ss[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
+    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(3)').click()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('暂不建议按此路线下载')"),platform+' 12GB VRAM 应阻止直接推荐大型视频模型'))
+    await evaluate("(() => {const s=document.querySelectorAll('.nvidia-goal-advisor .config-grid select');s[1].value='24';s[1].dispatchEvent(new Event('change',{bubbles:true}));s[2].value='120';s[2].dispatchEvent(new Event('change',{bubbles:true}))})()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .candidate-list')?.textContent.includes('LTX-2.5')"), platform+' 24GB VRAM/120GB 应重新出现视频候选'))
+    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(1)').click()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('语言模型')"),platform+' 语言路线未显示'))
+    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(2)').click()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('ComfyUI')"),platform+' 图像路线未显示'))
+    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(4)').click()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('whisper.cpp')"),platform+' 语音路线未显示'))
+    console.log('[PASS] '+platform+' 硬件筛选与四条独立模型路线切换')
+    for (const type of ['chat','image','video','audio']){
+      await navigate('/'+platform+'/'+type)
+      assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),platform+'/'+type+' 页面加载'))
+    }
+    console.log('[PASS] '+platform+' 四篇独立新手教程可访问')
+  }
+
   await navigate('/guide/start')
   assert.ok(await retry(() => evaluate("!!document.querySelector('.deployment-picker .selectors')"),'部署路线选择器'))
   console.log('[PASS] 部署路线向导显示')

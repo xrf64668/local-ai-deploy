@@ -24,4 +24,6 @@
 | 本地生成图片 | [Mac 图像模型专属路线](/mac/image) |
 | Mac 本地生成视频 | [Mac 视频模型选型](/mac/video) |
 | Mac 语音识别 | [Mac Whisper 专属路线](/mac/audio) |
+| Ubuntu / Linux NVIDIA | [Linux 先选配置和模型类型](/ubuntu/) |
+| Windows NVIDIA | [Windows 先选配置和模型类型](/windows/) |
 | 不知道硬件适合什么 | [容量推荐器](/recommend/) |

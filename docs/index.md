@@ -34,12 +34,12 @@ features:
     linkText: 查看计算结果
   - icon: "🖥️"
     title: Ubuntu · NVIDIA
-    details: GPU 服务器环境、CUDA 预检、ComfyUI 路线与显存排障。
+    details: 先填系统内存、NVIDIA 显存和磁盘，再分别进入聊天、图像、视频、语音的独立教程。
     link: /ubuntu/
     linkText: 选择部署路线
   - icon: "💻"
     title: Windows · NVIDIA
-    details: 图形安装与 PowerShell 手动安装，学会检查 CUDA 和模型目录。
+    details: 根据内存、显卡和模型类型选择教程，先完成首次生成，再看 PowerShell 与 API。
     link: /windows/
     linkText: 选择部署路线
   - icon: "🔌"
@@ -58,6 +58,8 @@ features:
 | 完全不懂模型和显存 | [选择部署路线](/guide/start) | 知道模型、后端与硬件的关系 |
 | 只有一台 Apple Silicon Mac | [按 Mac 配置选择模型类型](/mac/) | 找到自己的独立部署教程并完成真实生成 |
 | 想先用节点生成图片 | [ComfyUI 新手入口](/comfyui/) | 运行工作流并生成可打开的文件 |
+| 使用 Linux NVIDIA | [Linux 分类部署](/ubuntu/) | 按自己的 GPU 与目标选择一条路线 |
+| 使用 Windows NVIDIA | [Windows 分类部署](/windows/) | 先选择模型类型，再找到对应安装和验证 |
 | 希望从 Java / Web 调用 | [API 服务化](/mac/07-api) | 本机请求得到真实模型返回 |
 | 不知道我的配置适合什么 | [硬件容量计算](/recommend/) | 查看权重、KV 缓存、工作区及预算结果 |
 

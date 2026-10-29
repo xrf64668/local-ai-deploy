@@ -108,19 +108,39 @@ export default defineConfig({
         ] }
       ],
       '/ubuntu/': [
-        { text: 'Ubuntu NVIDIA', items: [
-          { text: 'Ubuntu 主页', link: '/ubuntu/' },
-          { text: 'Ollama 本地模型', link: '/ubuntu/ollama' },
-          { text: 'ComfyUI 安装', link: '/comfyui/ubuntu' },
-          { text: '按显存推荐模型', link: '/recommend/' }
+        { text: '从这里开始', items: [
+          { text: '选择我的 Linux 设备和目标', link: '/ubuntu/' },
+          { text: '按内存/显存计算', link: '/recommend/' },
+          { text: '模型来源与下载', link: '/guide/model-download' }
+        ] },
+        { text: '按模型类型分别部署', items: [
+          { text: '语言模型 · Ollama', link: '/ubuntu/chat' },
+          { text: '图像模型 · ComfyUI', link: '/ubuntu/image' },
+          { text: '视频模型 · LTX / Wan', link: '/ubuntu/video' },
+          { text: '语音识别 · Whisper', link: '/ubuntu/audio' }
+        ] },
+        { text: '开发者配置与技术原理（可选）', collapsed: true, items: [
+          { text: 'Ollama 完整命令与 API', link: '/ubuntu/ollama' },
+          { text: 'Ubuntu ComfyUI 与 CUDA 依赖', link: '/comfyui/ubuntu' },
+          { text: 'ComfyUI 本地 API', link: '/comfyui/api' }
         ] }
       ],
       '/windows/': [
-        { text: 'Windows NVIDIA', items: [
-          { text: 'Windows 主页', link: '/windows/' },
-          { text: 'Ollama 本地模型', link: '/windows/ollama' },
-          { text: 'ComfyUI 安装', link: '/comfyui/windows' },
-          { text: '按显存推荐模型', link: '/recommend/' }
+        { text: '从这里开始', items: [
+          { text: '选择我的 Windows 设备和目标', link: '/windows/' },
+          { text: '按内存/显存计算', link: '/recommend/' },
+          { text: '模型来源与下载', link: '/guide/model-download' }
+        ] },
+        { text: '按模型类型分别部署', items: [
+          { text: '语言模型 · Ollama', link: '/windows/chat' },
+          { text: '图像模型 · ComfyUI', link: '/windows/image' },
+          { text: '视频模型 · LTX / Wan', link: '/windows/video' },
+          { text: '语音识别 · Whisper', link: '/windows/audio' }
+        ] },
+        { text: '开发者配置与技术原理（可选）', collapsed: true, items: [
+          { text: 'Ollama 完整命令与 API', link: '/windows/ollama' },
+          { text: 'ComfyUI Desktop / CUDA 手动安装', link: '/comfyui/windows' },
+          { text: 'ComfyUI 本地 API', link: '/comfyui/api' }
         ] }
       ]
     },

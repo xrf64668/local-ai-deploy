@@ -1,14 +1,30 @@
-# Ubuntu · NVIDIA 本地 AI
+# Linux 本地 AI：先确认硬件，再选择模型类型
 
-从下面两条路线中选择，按步骤安装并完成一次真实生成。
+本栏目先覆盖 **Ubuntu 22.04+、NVIDIA CUDA** 的常见本地部署。其他 Linux 发行版、AMD/Intel GPU、纯 CPU 等方案会另行扩展；不要直接照搬 NVIDIA 的驱动和 CUDA 命令。
 
-| 目标 | 教程 | 完成标志 |
+**先填写自己的配置，再选择一种目标。** 聊天、生成图片、生成视频和语音识别不需要混装到同一套 Python 环境。
+
+<NvidiaGoalAdvisor platform="ubuntu" />
+
+## 四条不同的部署路线
+
+| 想实现什么 | 对应的独立教程 | 成功标志 |
 | --- | --- | --- |
-| 运行普通本地聊天模型 | [Ollama 安装与模型对话](/ubuntu/ollama) | 模型返回文字回答 |
-| 运行图像生成工作流 | [ComfyUI 安装与 GPU 验证](/comfyui/ubuntu) | 生成并打开图片 |
-| 检查显卡与容量 | [硬件基础](/guide/hardware) · [模型容量计算](/recommend/) | 了解显存预算与模型估算 |
-| 通过程序调用工作流 | [ComfyUI API](/comfyui/api) | 提交任务并查询结果 |
+| [语言模型：聊天与代码](/ubuntu/chat) | Ollama，按显存选择量化标签 | 模型回复文字 |
+| [图像模型：生成第一张图片](/ubuntu/image) | NVIDIA CUDA + ComfyUI | 保存可打开的图片 |
+| [视频模型：LTX / Wan](/ubuntu/video) | 官方 LTX Desktop / 已核对的对应工作流 | 生成可播放的 MP4 |
+| [语音识别：Whisper](/ubuntu/audio) | whisper.cpp，多语言模型 | 一段语音变成文字 |
 
-先执行 `nvidia-smi` 检查显卡与驱动。如果显卡无法正常读取，应先修复驱动再安装 CUDA 依赖。
+::: tip Linux 服务器用户
+无桌面的 Ubuntu 服务器不适合直接照搬 GUI 应用的安装方式。建议先使用 [ComfyUI 服务端教程](/comfyui/ubuntu)，用 SSH 隧道在自己的电脑访问；LTX Desktop 的图形安装则适用于有桌面环境的机器。
+:::
 
-更多任务可通过 [部署路线向导](/guide/start) 选择。视频生成、大规模并发与多 GPU 部署需要进一步核对对应运行时的实际资源需求。
+## 已经知道要下载什么？
+
+[国内外下载说明](/guide/model-download) · [搜索公开模型仓库](/guide/model-search) · [跨平台容量计算](/recommend/)
+
+::: details 进阶：需要自己控制驱动、容器、CUDA、模型目录或 API？
+先执行 `nvidia-smi` 核对驱动和 GPU。驱动故障应先排查，不应通过反复安装 PyTorch 来修复。每条模型专项单独管理其运行时、权重及结果；HTTP API 作为完成真实生成后的可选功能。
+
+[Ubuntu Ollama 完整命令](/ubuntu/ollama) · [Ubuntu ComfyUI 手动安装](/comfyui/ubuntu) · [ComfyUI API](/comfyui/api)
+:::

@@ -38,6 +38,9 @@ const results=computed(()=>profiles.value.map(model=>{
   }
 }))
 const selected=computed(()=>results.value.find(r=>r.model.id===selectedId.value))
+const candidates=computed(()=>results.value
+  .filter(r=>r.model.id!=='custom' && !r.error && r.budget.tier!=='exceeds')
+  .sort((a,b)=>b.model.paramsB-a.model.paramsB))
 const taskRoutes=computed(()=>{
   const p=platform.value
   if(task.value==='image')return {title:'ComfyUI：首次安装并生成图片',primary:p==='mac'?'/comfyui/mac':p==='ubuntu'?'/comfyui/ubuntu':'/comfyui/windows',secondary:'/comfyui/first-workflow',note:'图像峰值显存依赖工作流、分辨率、VAE、模型和节点，当前不使用语言模型的 KV 缓存公式计算。'}
@@ -159,6 +162,16 @@ const deployment=computed(()=>platform.value==='mac'?'/mac/models/ollama':platfo
           <p v-if="!r.error" class="fine">权重 {{ round2(r.estimate.weightsGiB) }} + KV {{ round2(r.estimate.kvGiB) }} + 工作区 {{ round2(r.estimate.workspaceGiB) }} = <strong>{{ round2(r.estimate.totalGiB) }} GiB</strong></p>
         </div>
       </div>
+      <h3>第四步 · 根据这台电脑的配置挑选模型</h3>
+      <p class="fine">下列候选按参数规模从大到小排列，只保留当前配置下未超出估算预算的模型。它们属于<strong>容量初筛</strong>，并不是已实机验证的兼容性名单。</p>
+      <div v-if="candidates.length" class="comparison" aria-label="模型容量初筛推荐结果">
+        <div v-for="r in candidates" :key="r.model.id" class="item">
+          <div class="item-head"><strong>{{ r.model.name }}</strong><span>{{ label(r.budget.tier) }}</span></div>
+          <p class="fine">估算占用 {{ round2(r.estimate.totalGiB) }} GiB · 预算剩余 {{ round2(r.budget.remainingGiB) }} GiB</p>
+          <a :href="withBase(deployment)">前往本系统的 Ollama 安装教程 →</a>
+        </div>
+      </div>
+      <p v-else class="error">当前条件下没有可列出的全 GPU 容量候选。可以缩小模型、缩短上下文或重新评估设备预留，不代表其他卸载方案完全不可用。</p>
       <p class="fine">其他模型的权重使用量化估算，不会套用你为当前模型填写的实际文件大小。显存预算不足意味着**不能按当前假设全部放入 GPU**，并不等于 CPU/显存混合运行绝对不可能。</p>
       <p class="next"><a :href="withBase(deployment)">按照本机平台进入 Ollama 安装教程 →</a></p>
     </template>

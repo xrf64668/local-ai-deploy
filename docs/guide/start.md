@@ -2,9 +2,7 @@
 
 第一次运行本地 AI，不用把所有文档都读完。先选择**使用的电脑、想完成的任务和自己的经验**，再按顺序完成硬件检查、计算资源、安装工具、下载模型、真实运行与 API 接入。
 
-<ClientOnly>
-  <DeploymentPathPicker />
-</ClientOnly>
+<DeploymentPathPicker />
 
 ## 怎样才算部署成功？
 

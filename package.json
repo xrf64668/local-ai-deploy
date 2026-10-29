@@ -7,7 +7,8 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "predocs:build": "node --test tests/model-memory.test.mjs"
+    "predocs:build": "node --test tests/model-memory.test.mjs",
+    "postdocs:build": "node scripts/verify-rendered-pages.mjs"
   },
   "devDependencies": {
     "vitepress": "1.6.4",

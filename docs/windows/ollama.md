@@ -20,6 +20,8 @@ ollama --version
 
 ## 03 · 下载一个模型
 
+国内/国外优先使用 Ollama 官方模型库；如果当前网络无法访问，可视情况通过**科学上网**连接官方服务。其他下载平台的 GGUF 文件需要另行导入适配，见 [模型下载指南](/guide/model-download)。
+
 本例使用 [qwen2.5:3b](https://ollama.com/library/qwen2.5:3b)，下载前请确认许可证和磁盘空间：
 
 ```powershell

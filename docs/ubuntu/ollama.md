@@ -43,6 +43,8 @@ curl -f http://127.0.0.1:11434/api/tags
 
 ## 04 · 下载模型并实际对话
 
+国外网络和能正常访问官方服务的国内网络可直接使用以下命令。官方访问受限时，可根据网络条件通过**科学上网**访问上游；ModelScope 与 HF 模型文件不能直接当作 Ollama 注册表中的模型。详细见 [下载渠道指南](/guide/model-download)。
+
 本例选用 [qwen2.5:3b](https://ollama.com/library/qwen2.5:3b)。下载前核对模型许可证与磁盘空间：
 
 ```bash

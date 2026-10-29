@@ -9,7 +9,8 @@
 | 本地聊天 | [Ollama 入门](/mac/models/ollama) | 模型能回答一段文字 |
 | 生成图片 | [ComfyUI 图形安装](/comfyui/mac) | 保存并打开一张生成图片 |
 | 尝试视频模型 | [LTX-2.5](/mac/models/ltx25) · [Wan2.2](/mac/models/wan22) | 用所选后端生成可播放视频 |
-| 根据芯片与内存选模型 | [Mac 专用推荐器](/mac/recommend/) | 找到候选与对应验证状态 |
+| 根据芯片与内存选模型 | [Mac 容量计算器](/mac/recommend/) | 查看模型容量估算与资源余量 |
+| 国内/国外下载模型 | [下载渠道选择](/guide/model-download) | 下载正确版本并完成文件核对 |
 
 ::: tip 刚开始使用？
 ComfyUI Desktop 可通过图形界面安装。只有需要控制 Python、缓存和模型路径时，再阅读 [Mac 手动安装](/comfyui/mac-manual) 或下面的进阶部署流程。
@@ -27,7 +28,9 @@ ComfyUI Desktop 可通过图形界面安装。只有需要控制 Python、缓存
 | [06 · 运行任务](/mac/06-inference) | 控制内存、分辨率和并发 | 输出可打开且过程可复现 |
 | [07 · 开放 API](/mac/07-api) | 通过 HTTP 调用模型 | 得到有效响应或任务结果 |
 
-[了解阶段之间的关系](/mac/roadmap) · [排查常见错误](/mac/troubleshooting)
+**第一次尝试视频模型？** 先看 [LTX-2.5 Q4：从下载到生成](/mac/models/ltx25) 或 [Wan2.2 Q8：完整操作](/mac/models/wan22)。每篇都含独立环境、下载命令与输出验收。
+
+[跨系统模型下载指南](/guide/model-download) · [阶段关系](/mac/roadmap) · [常见错误](/mac/troubleshooting)
 
 ## 关于视频模型的提醒
 

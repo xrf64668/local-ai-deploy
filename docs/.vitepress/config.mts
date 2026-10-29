@@ -25,13 +25,14 @@ export default defineConfig({
         { text: 'Mac 本地 AI 入门', items: [
           { text: '总览：从哪里开始', link: '/mac/' },
           { text: '部署路线与目录约定', link: '/mac/roadmap' },
-          { text: 'Mac 专用模型推荐器', link: '/mac/recommend/' }
+          { text: 'Mac 容量计算器', link: '/mac/recommend/' },
+          { text: '国内外下载模型', link: '/guide/model-download' }
         ] },
         { text: '01–07 部署实践', collapsed: false, items: [
           { text: '01 · 硬件与系统检查', link: '/mac/01-preflight' },
           { text: '02 · 独立环境与缓存', link: '/mac/02-environment' },
           { text: '03 · 选择推理运行时', link: '/mac/03-runtime' },
-          { text: '04 · 下载模型与锁定版本', link: '/mac/04-models' },
+          { text: '04 · 选择并下载模型', link: '/mac/04-models' },
           { text: '05 · 真实生成验证', link: '/mac/05-verify' },
           { text: '06 · 本地推理与资源控制', link: '/mac/06-inference' },
           { text: '07 · HTTP API 接入', link: '/mac/07-api' }
@@ -57,7 +58,7 @@ export default defineConfig({
         ] },
         { text: '第一次完整生成', items: [
           { text: '第一次生成图片', link: '/comfyui/first-workflow' },
-          { text: '模型路径与文件说明', link: '/comfyui/models-and-paths' },
+          { text: '下载模型与放置目录', link: '/comfyui/models-and-paths' },
           { text: '常见问题与排查', link: '/comfyui/troubleshooting' }
         ] },
         { text: '进阶与自动化', items: [
@@ -68,6 +69,7 @@ export default defineConfig({
       '/guide/': [
         { text: '基础知识', items: [
           { text: '部署路线选择', link: '/guide/start' },
+          { text: '如何下载模型（国内/国外）', link: '/guide/model-download' },
           { text: '什么是本地 AI 部署', link: '/guide/what-is-local-ai' },
           { text: '硬件、显存与统一内存', link: '/guide/hardware' },
           { text: '如何选择工具', link: '/guide/choose-tool' }

@@ -13,12 +13,14 @@ const install=computed(()=>{
 })
 const verify=computed(()=>target.value==='llm'?install.value:target.value==='audio'?'/guide/choose-tool':'/comfyui/first-workflow')
 const api=computed(()=>target.value==='llm'?platform.value==='mac'?'/mac/07-api':install.value:target.value==='audio'?'/guide/choose-tool':'/comfyui/api')
+const download=computed(()=>target.value==='llm'?install.value:target.value==='audio'?'/guide/model-download':target.value==='image'?'/comfyui/models-and-paths':'/guide/model-download')
 const stages=computed(()=>[
  {id:'01',name:'确认电脑配置',summary:'查看 GPU、内存或显存、操作系统和磁盘空间',link:platform.value==='mac'?'/mac/01-preflight':'/guide/hardware'},
  {id:'02',name:'计算容量与选择模型',summary:target.value==='llm'?'输入量化、上下文和内存，查看有公式的容量评估':'根据任务选择模型与权重；图像和视频还需工作流验证',link:target.value==='llm'?'/recommend/':'/comfyui/models-and-paths'},
  {id:'03',name:'安装运行工具',summary:'使用适合本机的安装教程，检查安装日志和服务状态',link:install.value},
- {id:'04',name:'完成第一次真实推理',summary:target.value==='llm'?'让模型回答问题，而不只是下载成功':'生成并打开实际文件，确认不是只启动了程序',link:verify.value},
- {id:'05',name:'按需要接入 API',summary:'先验证生成，再学习 HTTP 调用、任务状态和安全访问',link:api.value}
+ {id:'04',name:'选择来源并下载模型',summary:'先确认模型格式、版本、文件大小，再选择国内或国外下载渠道',link:download.value},
+ {id:'05',name:'完成第一次真实推理',summary:target.value==='llm'?'让模型回答问题，而不只是下载成功':'生成并打开实际文件，确认不是只启动了程序',link:verify.value},
+ {id:'06',name:'按需要接入 API',summary:'先验证生成，再学习 HTTP 调用、任务状态和安全访问',link:api.value}
 ])
 </script>
 <template>
@@ -34,7 +36,7 @@ const stages=computed(()=>[
     <select v-model="advanced"><option :value="false">第一次部署</option><option :value="true">熟悉命令行</option></select>
    </label>
   </div>
-  <p class="hint">已选择 {{ names[platform] }}。依次完成五步；某个模型能下载，不代表它一定能在当前硬件上推理。{{target==='audio'?'语音专项的完整安装教程仍在整理中，现提供工具选型入口。':''}}</p>
+  <p class="hint">已选择 {{ names[platform] }}。依次完成六步；某个模型能下载，不代表它一定能在当前硬件上推理。{{target==='audio'?'语音专项的完整安装教程仍在整理中，现提供工具选型入口。':''}}</p>
   <div class="stages">
    <article v-for="stage in stages" :key="stage.id" class="stage">
     <strong class="number">{{stage.id}}</strong>

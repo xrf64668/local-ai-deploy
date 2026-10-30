@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { withBase } from 'vitepress'
+import MacTaskRunbook from './MacTaskRunbook.vue'
 import { OLLAMA_MODELS, shortlistOllama } from '../../data/ollama-catalog.mjs'
 import { videoRecommendations } from '../../data/model-video.mjs'
 
@@ -122,7 +123,7 @@ onMounted(() => {
         <h3>04 · 本次部署方案</h3>
         <div class="summary"><strong>{{tasks.find(t=>t.id===task)?.title}}</strong><span>{{chip}} · {{memory}} GB 统一内存 · {{disk}} GB 可用磁盘</span><span>部署目标：{{selected?.name || video?.model.title || modelOptions.find(m=>m.id===modelId)?.title}}</span></div>
         <p v-if="task==='chat'">运行时：<strong>Ollama</strong>。先安装应用，再拉取所选模型，最后在终端真实提问。HTTP API 仅在运行成功后作为可选步骤。</p>
-        <p v-else class="notice">这一类型目前保留已编写的专项技术教程。向导已统一硬件、类型、模型和步骤入口，但还没有把它的安装命令全部迁入单页，不能宣称一键可用。</p>
+        <p v-else class="notice">此路线的基础安装、下载和真实产物验证已纳入当前页面。请按顺序操作，所有命令仍需在你的设备上实际验证。</p>
         <p class="muted">本站不会在浏览器中替你下载模型或执行终端命令，也不会把“容量符合”标记为“部署已验证”。</p>
       </template>
       <template v-else-if="step===4">
@@ -135,8 +136,7 @@ onMounted(() => {
           <p class="muted">下载完成并不代表推理成功；请继续下一步验证。</p>
         </template>
         <template v-else>
-          <p class="notice">此类模型的完整依赖安装和下载操作尚未迁入新版向导。为避免提供不完整或错误命令，请按保留的专项教程执行。</p>
-          <a :href="guide" class="secondary-link">查看{{tasks.find(t=>t.id===task)?.title}}的完整原教程 →</a>
+          <MacTaskRunbook :task="task as 'image'|'video'|'audio'" :model-id="modelId" phase="install" />
         </template>
       </template>
       <template v-else>
@@ -149,7 +149,7 @@ onMounted(() => {
           <p v-if="confirmed" class="success">已由你确认本机推理成功。网站未远程核验此结果。</p>
           <details><summary>可选：从 Java 或其他程序使用 HTTP API</summary><p>Ollama 服务运行后可以用以下命令检查本地接口（不是独立的安装步骤）：</p><div class="command"><code>curl http://127.0.0.1:11434/api/tags</code><button type="button" @click="copy('curl http://127.0.0.1:11434/api/tags')">复制</button></div><p>响应模型列表后，可进一步阅读 <a :href="apiGuide">Ollama API 进阶说明</a>。</p></details>
         </template>
-        <template v-else><p class="notice">请先完成专项教程中的真实图片、MP4 或文字转录验收。此类型尚未接入 V2 的可核验单页步骤。</p><a :href="guide" class="secondary-link">打开原有完整验证教程 →</a></template>
+        <template v-else><MacTaskRunbook :task="task as 'image'|'video'|'audio'" :model-id="modelId" phase="verify" /><label class="check"><input v-model="confirmed" type="checkbox"> 我已在本机检查实际生成的文件或识别结果</label><p v-if="confirmed" class="success">已由你确认产物验收；网站无法自动访问本机产物。</p></template>
       </template>
     </div>
     <p v-if="status" class="muted" role="status">{{status}}</p>

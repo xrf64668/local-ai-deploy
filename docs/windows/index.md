@@ -4,9 +4,9 @@
 
 **先填内存、显存和磁盘，再选一个自己要完成的目标。** Windows 的安装、路径和 PowerShell 命令不与 Linux 或 Mac 混用。
 
-<NvidiaGoalAdvisor platform="windows" />
+<NvidiaUnifiedWizard platform="windows" />
 
-## 四条不同的部署路线
+## 四条不同的部署路线（进阶参考）
 
 | 我的目标 | 独立教程 | 第一次成功的标志 |
 | --- | --- | --- |

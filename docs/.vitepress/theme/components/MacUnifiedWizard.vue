@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { withBase } from 'vitepress'
 import MacTaskRunbook from './MacTaskRunbook.vue'
+import HubModelSearch from './HubModelSearch.vue'
 import { OLLAMA_MODELS, shortlistOllama } from '../../data/ollama-catalog.mjs'
 import { videoRecommendations } from '../../data/model-video.mjs'
 
@@ -118,6 +119,7 @@ onMounted(() => {
         <div v-if="modelOptions.length" class="models"><button v-for="m in modelOptions" :key="m.id" type="button" :class="{picked:modelId===m.id}" @click="chooseModel(m.id)"><strong>{{m.title}}</strong><small>{{m.detail}}</small></button></div>
         <p v-else class="notice">当前目录没有通过容量初筛的候选。请返回修改硬件预算，或查看技术文档了解更小的模型。</p>
         <p v-if="task==='video'" class="muted">未通过视频模型参考门槛的候选已隐藏；LTX 与 Wan 的运行环境不能互相套用。</p>
+        <details class="catalog-discovery"><summary>没找到目标模型？搜索 Hugging Face 公开仓库（进阶）</summary><p class="muted">搜索结果只用于发现和独立下载，**不会自动加入已审核部署候选**。请勿将未经核实的模型直接套用其他配方。</p><HubModelSearch /></details>
       </template>
       <template v-else-if="step===3">
         <h3>04 · 本次部署方案</h3>

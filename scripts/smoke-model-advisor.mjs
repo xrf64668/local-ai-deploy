@@ -191,29 +191,22 @@ try {
 
   // Mac V2 interaction is tested below using the unified wizard selectors.
 
-  // Linux and Windows share the same information architecture as Mac:
-  // choose hardware → model type → task-specific guide.
-  for (const platform of ['ubuntu','windows']){
+  // Linux and Windows V2 six-stage UI entry points.
+  for (const platform of ['ubuntu','windows']) {
     await navigate('/'+platform+'/')
-    assert.ok(await retry(() => evaluate("!!document.querySelector('.nvidia-goal-advisor .purpose-grid') && document.querySelectorAll('.nvidia-goal-advisor .purpose-card').length===4"), platform+' 四大模型类型入口缺失'))
-    assert.ok(await evaluate("!!document.querySelector('.nvidia-goal-advisor .empty')"),platform+' 尚未填写硬件不应显示推荐')
-    await evaluate("(() => {const ss=document.querySelectorAll('.nvidia-goal-advisor .config-grid select');for(const [i,v] of ['32','12','80'].entries()){ss[i].value=v;ss[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(3)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('暂不建议按此路线下载')"),platform+' 12GB VRAM 应阻止直接推荐大型视频模型'))
-    await evaluate("(() => {const s=document.querySelectorAll('.nvidia-goal-advisor .config-grid select');s[1].value='24';s[1].dispatchEvent(new Event('change',{bubbles:true}));s[2].value='120';s[2].dispatchEvent(new Event('change',{bubbles:true}))})()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .candidate-list')?.textContent.includes('LTX-2.5')"), platform+' 24GB VRAM/120GB 应重新出现视频候选'))
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(1)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('语言模型')"),platform+' 语言路线未显示'))
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(2)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('ComfyUI')"),platform+' 图像路线未显示'))
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(4)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('whisper.cpp')"),platform+' 语音路线未显示'))
-    console.log('[PASS] '+platform+' 硬件筛选与四条独立模型路线切换')
-    for (const type of ['chat','image','video','audio']){
+    assert.ok(await retry(() => evaluate("!!document.querySelector('.nv-wizard .fields')")), platform+' V2 硬件配置入口缺失')
+    assert.ok(await evaluate("document.querySelector('.nv-wizard .actions button:last-child')?.disabled===true"),platform+' 未填写硬件不得继续')
+    await evaluate("(() => {const s=document.querySelectorAll('.nv-wizard .fields select');for(const [i,v] of ['32','12','80'].entries()){s[i].value=v;s[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nv-wizard .actions button:last-child')?.disabled===false"),platform+' 硬件配置未接受')
+    await evaluate("document.querySelector('.nv-wizard .actions button:last-child').click()")
+    assert.ok(await retry(() => evaluate("document.querySelectorAll('.nv-wizard .choices button').length===4"),platform+' 四类模型未显示'))
+    await evaluate("document.querySelector('.nv-wizard .actions button:last-child').click()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nv-wizard .choices button')!==null"),platform+' 模型候选未显示'))
+    console.log('[PASS] '+platform+' V2 六阶段入口、硬件和模型选择')
+    for(const type of ['chat','image','video','audio']){
       await navigate('/'+platform+'/'+type)
-      assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),platform+'/'+type+' 页面加载'))
+      assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),platform+'/'+type+' 旧教程保留'))
     }
-    console.log('[PASS] '+platform+' 四篇独立新手教程可访问')
   }
 
   await navigate('/guide/start')

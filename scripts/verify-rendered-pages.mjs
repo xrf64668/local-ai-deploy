@@ -6,8 +6,8 @@ const root = 'docs/.vitepress/dist'
 const cases = [
   {route:'recommend/',markers:['交互式硬件容量计算器','运行平台','模型权重','当前硬件的模型推荐结果','计算面板没有显示']},
   {route:'mac/recommend/',markers:['Mac 交互式容量计算器','芯片系列','模型权重','当前硬件的模型推荐结果','计算面板没有显示']},
-  {route:'ubuntu/',markers:['确认自己的电脑配置','语言模型','视频模型']},
-  {route:'windows/',markers:['确认自己的电脑配置','图像模型','语音识别']},
+  {route:'ubuntu/',markers:['Linux 本地 AI','Ubuntu 部署向导','填写硬件配置']},
+  {route:'windows/',markers:['Windows 本地 AI','Windows 部署向导','六步']},
   {route:'ubuntu/chat',markers:['Ubuntu 语言模型','安装 Ollama','下载并运行你选的模型']},
   {route:'ubuntu/image',markers:['Ubuntu 图像模型','ComfyUI','第一次生成']},
   {route:'ubuntu/video',markers:['Ubuntu 视频模型','LTX','Wan']},

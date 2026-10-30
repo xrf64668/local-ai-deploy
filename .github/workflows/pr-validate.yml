@@ -1,0 +1,42 @@
+name: Validate pull request
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Test HTTP worker lifecycle
+        run: python -m unittest discover -s examples/ltx_http/tests -v
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile Java API sample
+        run: |
+          mkdir -p "$RUNNER_TEMP/ltx-java"
+          javac -encoding UTF-8 -d "$RUNNER_TEMP/ltx-java" examples/ltx_http/LtxApiClient.java
+      - name: Test and build VitePress
+        run: npm run docs:build
+      - name: Browser smoke test
+        run: node scripts/smoke-model-advisor.mjs

@@ -189,56 +189,24 @@ try {
   console.log('[PASS] 模型搜索 → 查看仓库 → 用户确认 → 生成下载命令')
 
 
-  // Mac portal: real device-first interaction, and each task must have an isolated route.
-  await navigate('/mac/')
-  assert.ok(await retry(() => evaluate("!!document.querySelector('.mac-path-advisor .goal-grid') && document.querySelectorAll('.mac-path-advisor .goal-card').length===4"),'Mac 新入口四种模型类型渲染失败'))
-  assert.ok(await evaluate("!!document.querySelector('.mac-path-advisor .empty-state') && !document.querySelector('.mac-path-advisor .advice-panel')"),'未填写硬件时不能冒充已识别配置')
-  await evaluate("(() => { const s=document.querySelectorAll('.mac-path-advisor .hardware-grid select');for(const [i,v] of ['M4','16','30'].entries()){s[i].value=v;s[i].dispatchEvent(new Event('change',{bubbles:true}))} })()")
-  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(3)').click()")
-  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('LTX-2.3') && document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('统一内存')"),'Mac 16GB 视频路线未根据配置更新'))
-  assert.ok(await evaluate("document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('暂不推荐下载')"),'16GB 应明确标记大型视频模型不适用')
-  const beginnerVideo=await evaluate("JSON.stringify([...document.querySelectorAll('.mac-path-advisor .mini-item')].map(x=>({name:x.querySelector('strong')?.innerText,href:x.querySelector('a')?.getAttribute('href')||null})))")
-  assert.ok(beginnerVideo.includes('ltx23'),'16GB 必须提供 LTX2.3 的独立下载路线')
-  console.log('[PASS] Mac 16GB/30GB 视频只推荐适合进一步尝试的 LTX-2.3 专项教程')
-  await evaluate("(() => {const s=document.querySelectorAll('.mac-path-advisor .hardware-grid select');s[1].value='64';s[1].dispatchEvent(new Event('change',{bubbles:true}));s[2].value='120';s[2].dispatchEvent(new Event('change',{bubbles:true}))})()")
-  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('LTX-2.5') && document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('Wan2.2')"),'Mac 64GB 120GB 应展示 LTX/Wan 两条独立路线'))
-  console.log('[PASS] Mac 64GB/120GB 视频重新计算并出现 LTX 和 Wan 不同路线')
-  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(1)').click()")
-  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('Ollama') || document.querySelector('.mac-path-advisor .mini-list')?.textContent.includes('Qwen')"),'切换语言模型后必须显示语言类候选'))
-  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(2)').click()")
-  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('ComfyUI Desktop')"),'图像路线必须独立于视频'))
-  await evaluate("document.querySelector('.mac-path-advisor .goal-card:nth-child(4)').click()")
-  assert.ok(await retry(() => evaluate("document.querySelector('.mac-path-advisor .advice-panel')?.textContent.includes('whisper.cpp')"),'语音路线必须独立'))
-  console.log('[PASS] 语言/图像/视频/语音四种目标互相独立切换')
-  for(const route of ['/mac/chat','/mac/image','/mac/video','/mac/audio','/mac/models/ltx23']){
-    await navigate(route)
-    assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),'专属文档 '+route))
-  }
-  console.log('[PASS] 五篇 Mac 独立教程可直接访问')
+  // Mac V2 interaction is tested below using the unified wizard selectors.
 
-  // Linux and Windows share the same information architecture as Mac:
-  // choose hardware → model type → task-specific guide.
-  for (const platform of ['ubuntu','windows']){
+  // Linux and Windows V2 six-stage UI entry points.
+  for (const platform of ['ubuntu','windows']) {
     await navigate('/'+platform+'/')
-    assert.ok(await retry(() => evaluate("!!document.querySelector('.nvidia-goal-advisor .purpose-grid') && document.querySelectorAll('.nvidia-goal-advisor .purpose-card').length===4"), platform+' 四大模型类型入口缺失'))
-    assert.ok(await evaluate("!!document.querySelector('.nvidia-goal-advisor .empty')"),platform+' 尚未填写硬件不应显示推荐')
-    await evaluate("(() => {const ss=document.querySelectorAll('.nvidia-goal-advisor .config-grid select');for(const [i,v] of ['32','12','80'].entries()){ss[i].value=v;ss[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(3)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('暂不建议按此路线下载')"),platform+' 12GB VRAM 应阻止直接推荐大型视频模型'))
-    await evaluate("(() => {const s=document.querySelectorAll('.nvidia-goal-advisor .config-grid select');s[1].value='24';s[1].dispatchEvent(new Event('change',{bubbles:true}));s[2].value='120';s[2].dispatchEvent(new Event('change',{bubbles:true}))})()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .candidate-list')?.textContent.includes('LTX-2.5')"), platform+' 24GB VRAM/120GB 应重新出现视频候选'))
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(1)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('语言模型')"),platform+' 语言路线未显示'))
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(2)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('ComfyUI')"),platform+' 图像路线未显示'))
-    await evaluate("document.querySelector('.nvidia-goal-advisor .purpose-card:nth-child(4)').click()")
-    assert.ok(await retry(() => evaluate("document.querySelector('.nvidia-goal-advisor .output')?.textContent.includes('whisper.cpp')"),platform+' 语音路线未显示'))
-    console.log('[PASS] '+platform+' 硬件筛选与四条独立模型路线切换')
-    for (const type of ['chat','image','video','audio']){
+    assert.ok(await retry(() => evaluate("!!document.querySelector('.nv-wizard .fields')")), platform+' V2 硬件配置入口缺失')
+    assert.ok(await evaluate("document.querySelector('.nv-wizard .actions button:last-child')?.disabled===true"),platform+' 未填写硬件不得继续')
+    await evaluate("(() => {const s=document.querySelectorAll('.nv-wizard .fields select');for(const [i,v] of ['32','12','80'].entries()){s[i].value=v;s[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nv-wizard .actions button:last-child')?.disabled===false"),platform+' 硬件配置未接受'))
+    await evaluate("document.querySelector('.nv-wizard .actions button:last-child').click()")
+    assert.ok(await retry(() => evaluate("document.querySelectorAll('.nv-wizard .choices button').length===4"),platform+' 四类模型未显示'))
+    await evaluate("document.querySelector('.nv-wizard .actions button:last-child').click()")
+    assert.ok(await retry(() => evaluate("document.querySelector('.nv-wizard .choices button')!==null"),platform+' 模型候选未显示'))
+    console.log('[PASS] '+platform+' V2 六阶段入口、硬件和模型选择')
+    for(const type of ['chat','image','video','audio']){
       await navigate('/'+platform+'/'+type)
-      assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),platform+'/'+type+' 页面加载'))
+      assert.ok(await retry(() => evaluate("!!document.querySelector('main h1')"),platform+'/'+type+' 旧教程保留'))
     }
-    console.log('[PASS] '+platform+' 四篇独立新手教程可访问')
   }
 
   await navigate('/guide/start')
@@ -251,15 +219,37 @@ try {
   console.log('[PASS] 从零开始入口不再拆成六个可点击步骤')
 
   await navigate('/mac/?task=chat')
-  assert.ok(await retry(()=>evaluate("document.querySelector('.mac-path-advisor .advice-panel')===null && !!document.querySelector('.mac-path-advisor .goal-card[aria-pressed=true]')")),'跨页任务类型未预选')
-  await evaluate("(() => {const s=document.querySelectorAll('.mac-path-advisor .hardware-grid select');for(const [i,v] of ['M4','64','120'].entries()){s[i].value=v;s[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
-  assert.ok(await retry(()=>evaluate("document.querySelector('.mac-path-advisor .mini-item a')?.getAttribute('href').includes('/mac/chat?')")),'Mac 语言模型不得再绕去通用下载页')
-  const selectedMac=await evaluate("document.querySelector('.mac-path-advisor .mini-item a')?.getAttribute('href')")
-  assert.ok(selectedMac.includes('model='),'模型选择必须随路由保留')
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.unified-wizard .fields')")),'Mac V2 入口未显示')
+  assert.ok(await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary')?.disabled===true"),'硬件信息不足时不应进入下一步')
+  await evaluate("(() => {const s=document.querySelectorAll('.unified-wizard .fields select');for(const [i,v] of ['M4','64','120'].entries()){s[i].value=v;s[i].dispatchEvent(new Event('change',{bubbles:true}))}})()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.unified-wizard .wizard-actions .primary')?.disabled===false"),'填写硬件后应允许下一步'))
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary').click()")
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.unified-wizard .choices')"),'模型类型选择未显示'))
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary').click()")
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.unified-wizard .models button')"),'模型列表未显示'))
+  assert.ok(await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary')?.disabled===true"),'未选择型号不应跳过模型选择')
+  await evaluate("document.querySelector('.unified-wizard .models button').click()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.unified-wizard .wizard-actions .primary')?.disabled===false"),'选择型号后应允许下一步'))
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary').click()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.unified-wizard .summary') !== null"),'部署方案步骤未显示'))
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary').click()")
+  assert.ok(await retry(() => evaluate("document.querySelector('.unified-wizard .wizard-body')?.textContent.includes('ollama pull')"),'单页缺少下载命令'))
+  assert.ok(await evaluate("document.querySelectorAll('.unified-wizard .command').length===3"),'安装、下载与检查未保留在同页')
+  await navigate('/mac/')
+  assert.ok(await retry(() => evaluate("document.querySelector('.unified-wizard .wizard-body')?.textContent.includes('ollama pull')"),'页面刷新后未恢复当前步骤'))
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .ghost').click()")
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .ghost').click()")
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .ghost').click()")
+  assert.ok(await retry(() => evaluate("!!document.querySelector('.unified-wizard .choices')"),'返回模型类型步骤失败'))
+  await evaluate("document.querySelectorAll('.unified-wizard .choices button')[2].click()")
+  await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary').click()")
+  assert.ok(await retry(() => evaluate("!document.querySelector('.unified-wizard .models .picked')"),'切换模型类型后必须清除旧选择'))
+  console.log('[PASS] Mac V2 单页部署、状态恢复与切换类型清理旧选择')
+
   await navigate('/mac/chat?model=q38&chip=M4&memory=64&disk=120')
-  assert.ok(await retry(()=>evaluate("document.querySelector('#quick-ollama-model')?.value==='q38' && document.querySelector('.one-page-ollama')?.textContent.includes('ollama pull qwen3.8:27b')")),'进入教程后没有恢复选择的 Qwen3.8 和下载命令')
-  assert.ok(await evaluate("document.querySelector('.deployment-selection')?.textContent.includes('64 GB')"),'硬件参数必须跟随到完整教程')
-  console.log('[PASS] Mac 推荐 → 同一篇 Ollama 教程，模型和硬件配置不丢失')
+  assert.ok(await retry(()=>evaluate("document.querySelector('#quick-ollama-model')?.value==='q38' && document.querySelector('.one-page-ollama')?.textContent.includes('ollama pull qwen3.8:27b')")),'原有专属教程仍需可用')
+  assert.ok(await evaluate("document.querySelector('.deployment-selection')?.textContent.includes('64 GB')"),'原教程硬件参数必须保留')
+  console.log('[PASS] 原有 Mac 专属教程兼容')
 
   for(const platform of ['ubuntu','windows']){
     await navigate('/'+platform+'/chat?model=q7&memory=32&vram=12&disk=80')

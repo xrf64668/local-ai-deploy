@@ -73,7 +73,7 @@ const advanced=computed(()=>withBase(props.task==='video'?'/mac/video':props.tas
     <p class="muted"><strong>{{recipe.title}}</strong> · <a :href="recipe.source" target="_blank" rel="noopener noreferrer">核对上游来源与许可证 ↗</a></p>
     <p class="runbook-warning">{{recipe.warning}}</p>
     <div v-for="(item,index) in items" :key="index" class="operation">
-      <h4>{{index+1}}. {{phase==='install'?item.title:'真实产物验收'}}</h4>
+      <h4>{{index+1}}. {{phase==='install' && 'title' in item ? item.title : '真实产物验收'}}</h4>
       <p>{{item.text}}</p>
       <div v-if="item.command" class="runbook-command"><pre><code>{{item.command}}</code></pre><button type="button" @click="copy(item.command!)">复制命令</button></div>
     </div>

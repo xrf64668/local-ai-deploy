@@ -249,7 +249,7 @@ try {
   assert.ok(await retry(() => evaluate("!!document.querySelector('.unified-wizard .choices')"),'返回模型类型步骤失败'))
   await evaluate("document.querySelectorAll('.unified-wizard .choices button')[2].click()")
   await evaluate("document.querySelector('.unified-wizard .wizard-actions .primary').click()")
-  assert.ok(await retry(() => evaluate("!document.querySelector('.unified-wizard .models') || !document.querySelector('.unified-wizard .models .picked')"),'切换模型类型后必须清除旧选择')
+  assert.ok(await retry(() => evaluate("!document.querySelector('.unified-wizard .models .picked')"),'切换模型类型后必须清除旧选择'))
   console.log('[PASS] Mac V2 单页部署、状态恢复与切换类型清理旧选择')
 
   await navigate('/mac/chat?model=q38&chip=M4&memory=64&disk=120')

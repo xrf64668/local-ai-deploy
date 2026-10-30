@@ -4,9 +4,9 @@
 
 **先填写自己的配置，再选择一种目标。** 聊天、生成图片、生成视频和语音识别不需要混装到同一套 Python 环境。
 
-<NvidiaGoalAdvisor platform="ubuntu" />
+<NvidiaUnifiedWizard platform="ubuntu" />
 
-## 四条不同的部署路线
+## 四条不同的部署路线（进阶参考）
 
 | 想实现什么 | 对应的独立教程 | 成功标志 |
 | --- | --- | --- |
